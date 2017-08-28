@@ -11,8 +11,7 @@ var server = net.createServer(function(socket)
 
 server.listen(8888,function()
 {
-        var address=server.address();
-        console.log(" opened server on address %j ",address);
+    console.log(" opened server on address %j ", server.address());
 });
 
 
