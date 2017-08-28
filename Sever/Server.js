@@ -1,4 +1,7 @@
 
+var SerExec_Enter = 1000;
+var SerExec_Start = 1001;
+
 var net = require('net');
 var server = net.createServer(function(socket)
 {
