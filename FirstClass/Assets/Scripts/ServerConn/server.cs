@@ -1,7 +1,7 @@
 ﻿using UnityEngine;  
 using System.Collections;
 using System.IO;
-using SocketIOClient;
+
 using UnityEngine.UI;
 using System.Net.Sockets;
 using System.Net;  
