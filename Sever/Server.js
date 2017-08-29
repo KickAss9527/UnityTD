@@ -1,14 +1,38 @@
 
-var SerExec_Enter = 1000;
-var SerExec_Start = 1001;
+var Exec_Enter = 1000;
+var Exec_Ready = 1001;
+var PlayerID = 9527;
 
 var net = require('net');
 var server = net.createServer(function(socket)
 {
   socket.on('data', function(data)
   {
-    console.log("rec data : ", data.toString());
-    socket.write('sf u');
+    var msg = data.toString();
+    var json = JSON.parse(msg);
+
+    console.log(msg);
+    var exc = parseInt(json["exec"]);
+    switch (exc) {
+      case Exec_Enter:
+      {
+        var msg =  "{\"exec\" : " + Exec_Enter.toString();
+        msg += ", \"uid\" : " + PlayerID.toString() + "}";
+        socket.write(msg);
+        PlayerID++;
+      }
+        break;
+      case Exec_Ready:
+      {
+        var msg =  "{\"exec\" : " + Exec_Ready.toString();
+        var config = JSON.stringify(Terrain.getTerrainConfig());
+        msg += ", \"config\" : " + config + "}";
+        socket.write(msg);
+      }
+      break;
+      default:
+        break;
+    }
   });
 });
 

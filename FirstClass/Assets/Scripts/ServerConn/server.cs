@@ -10,6 +10,13 @@ using System.Text;
 using System.Threading;
 using System;
 
+public class ServerMsg
+{
+	public int exec;
+	public string uid;
+	public string[] config; //地形
+}
+
 public class Server : Singleton<Server>  {
 
 	// Use this for initialization
@@ -18,7 +25,13 @@ public class Server : Singleton<Server>  {
 //		//invoke when socket opened
 //		Debug.Log ("open");
 //	}
+
+	private const int Exec_Enter = 1000;
+	private const int Exec_Ready = 1001;
+
 	private Socket clientSocket;
+	private string strPlayerID;
+
 	void ReceiveSocket()  
 	{  
 		//在这个线程中接受服务器返回的数据  
@@ -44,7 +57,8 @@ public class Server : Singleton<Server>  {
 					break;  
 				}     
 				UTF8Encoding enc = new UTF8Encoding();
-				Debug.Log(enc.GetString(bytes));
+				string msg = enc.GetString(bytes);
+				recvMsg(msg);
 			}  
 			catch (Exception e)  
 			{  
@@ -65,13 +79,13 @@ public class Server : Singleton<Server>  {
 			clientSocket.Connect(ip_end_point);  
 			Debug.Log("connect to server");
 
-			UTF8Encoding enc = new UTF8Encoding();
-
-			clientSocket.Send(enc.GetBytes("gei server"));
-
 			Thread th = new Thread(new ThreadStart(ReceiveSocket));
 			th.IsBackground = true;
 			th.Start();
+
+			sendMsg("{\"exec\" : " + Exec_Enter.ToString () + "}");
+
+
 		}
 		catch{ Debug.Log ("coonect failed");}
 
@@ -104,6 +118,38 @@ public class Server : Singleton<Server>  {
 //		}
 //		GameObject.Destroy (tt);
 
+	}
+
+	private void recvMsg(string msg)
+	{
+		Debug.Log (msg);
+		ServerMsg data = JsonUtility.FromJson<ServerMsg> (msg);
+		switch (data.exec) 
+		{
+		case Exec_Enter:
+			{
+				this.strPlayerID = data.uid;
+			}
+			break;
+		case Exec_Ready:
+			{
+				string[] strTerrain = data.config;
+				Debug.Log (strTerrain[0][2]);
+				Debug.Log (strTerrain[9][2]);
+			}
+			break;
+		}
+	}
+
+	private void sendMsg(string msg)
+	{
+		UTF8Encoding enc = new UTF8Encoding ();
+		this.clientSocket.Send (enc.GetBytes (msg));
+	}
+
+	public void sendReady()
+	{
+		sendMsg ("{\"exec\" : " + Exec_Ready.ToString () + "}");
 	}
 
 	// Update is called once per frame

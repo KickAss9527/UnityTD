@@ -1,7 +1,7 @@
 //path ----------
 //12w x 10h
 
-var TerrainConfig = [
+ TerrainConfig = [
   "XXXXXXXOOOOO", //0
   "XXXXXXXOOOOX", //1
   "XXXXXXXOOOOX", //2
@@ -15,7 +15,10 @@ var TerrainConfig = [
 // 0123456789
 var TerrainWidth = TerrainConfig[0].length;
 var TerrainHeight = TerrainConfig.length;
-
+this.getTerrainConfig = function()
+{
+  return TerrainConfig;
+}
 function convertXYToId(x, y){return x + y*TerrainWidth;}
 function TerrainTilePoint(x, y)
 {
