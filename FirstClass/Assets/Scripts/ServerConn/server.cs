@@ -4,8 +4,6 @@ using System.IO;
 using UnityEngine.UI;
 using System.Net.Sockets;
 using System.Net;  
-using System.Net.Sockets;  
-using System.IO;
 using System.Text;
 using System.Threading;
 using System;
@@ -15,6 +13,9 @@ public class ServerMsg
 	public int exec;
 	public string uid;
 	public string[] config; //地形
+	public int iStartTag;
+	public int iEndTag;
+	public int[] arrPath;
 }
 
 public class Server : Singleton<Server>  {
@@ -28,7 +29,7 @@ public class Server : Singleton<Server>  {
 
 	private const int Exec_Enter = 1000;
 	private const int Exec_Ready = 1001;
-
+	private string tmpMsg;
 	private Socket clientSocket;
 	private string strPlayerID;
 
@@ -72,7 +73,7 @@ public class Server : Singleton<Server>  {
 	public void launch () 
 	{
 		clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-		IPAddress mIp = IPAddress.Parse("192.168.1.101");  
+		IPAddress mIp = IPAddress.Parse("192.168.1.102");  
 		IPEndPoint ip_end_point = new IPEndPoint(mIp, 8888);  
 
 		try {  
@@ -123,22 +124,8 @@ public class Server : Singleton<Server>  {
 	private void recvMsg(string msg)
 	{
 		Debug.Log (msg);
-		ServerMsg data = JsonUtility.FromJson<ServerMsg> (msg);
-		switch (data.exec) 
-		{
-		case Exec_Enter:
-			{
-				this.strPlayerID = data.uid;
-			}
-			break;
-		case Exec_Ready:
-			{
-				string[] strTerrain = data.config;
-				Debug.Log (strTerrain[0][2]);
-				Debug.Log (strTerrain[9][2]);
-			}
-			break;
-		}
+		this.tmpMsg = msg;
+
 	}
 
 	private void sendMsg(string msg)
@@ -154,6 +141,27 @@ public class Server : Singleton<Server>  {
 
 	// Update is called once per frame
 	void Update () {
-		
+		if (this.tmpMsg == null)
+			return;
+		ServerMsg data = JsonUtility.FromJson<ServerMsg> (this.tmpMsg);
+		this.tmpMsg = null;
+		switch (data.exec) 
+		{
+		case Exec_Enter:
+			{
+				this.strPlayerID = data.uid;
+			}
+			break;
+		case Exec_Ready:
+			{
+				string[] strTerrain = data.config;
+				int[] arrPath = data.arrPath;
+				int start = data.iStartTag;
+				int end = data.iEndTag;
+
+				GameManager.Instance.setupConfig (strTerrain, start, end, arrPath);
+			}
+			break;
+		}
 	}
 }

@@ -7,7 +7,7 @@ public class MainPage : MonoBehaviour {
 	public Button btnReady;
 	// Use this for initialization
 	void Start () {
-		Server.Instance.launch ();
+		GameManager.Instance.startGame();
 		this.btnReady.onClick.AddListener (onClick);
 	}
 	
@@ -22,6 +22,6 @@ public class MainPage : MonoBehaviour {
 		txt.text = "Waiting...";
 		this.btnReady.enabled = false;
 
-		Server.Instance.sendReady ();
+		GameManager.Instance.playerReady ();
 	}
 }

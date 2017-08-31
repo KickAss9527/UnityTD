@@ -26,7 +26,10 @@ var server = net.createServer(function(socket)
       {
         var msg =  "{\"exec\" : " + Exec_Ready.toString();
         var config = JSON.stringify(Terrain.getTerrainConfig());
-        msg += ", \"config\" : " + config + "}";
+        msg += ", \"config\"  : " + config;
+        msg += ", \"start\"   : " + Terrain.getStartPointTag().toString();
+        msg += ", \"end\"     : " + Terrain.getEndPointTag().toString();
+        msg += ", \"path\"    : " + JSON.stringify(Terrain.searchPath()) + "}";
         socket.write(msg);
       }
       break;
@@ -42,4 +45,3 @@ server.listen(8888,function()
 });
 
 var Terrain = require('./Terrain.js');
-Terrain.searchPath();

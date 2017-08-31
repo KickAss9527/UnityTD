@@ -15,6 +15,10 @@
 // 0123456789
 var TerrainWidth = TerrainConfig[0].length;
 var TerrainHeight = TerrainConfig.length;
+var PointA = new TerrainTile(new TerrainTilePoint(11, 0));
+var PointB = new TerrainTile(new TerrainTilePoint(0, 9));
+this.getStartPointTag = function(){return PointA.objPoint.tId;}
+this.getEndPointTag = function(){return PointB.objPoint.tId;}
 this.getTerrainConfig = function()
 {
   return TerrainConfig;
@@ -39,8 +43,7 @@ function TerrainTile(tileObj)
     this.objParent = null;
 }
 
-var PointA = new TerrainTile(new TerrainTilePoint(11, 0));
-var PointB = new TerrainTile(new TerrainTilePoint(0, 9));
+
 
 function findPath(terrain)
 {
@@ -134,24 +137,14 @@ function findPath(terrain)
 
   if (PointB.objParent)//找到了
   {
-    var res = [PointB];
+    var res = [PointB.objPoint.tId];
     var cur = PointB;
     while (cur.objParent)
     {
-        res.push(cur.objParent);
+        res.push(cur.objParent.objPoint.tId);
         cur = cur.objParent;
     }
-
     res.reverse();
-    for (var i=0; i<res.length; i++)
-    {
-      var tile = res[i];
-      var info = 'x: ' + tile.objPoint.iX;
-      info += ', y: ' + tile.objPoint.iY;
-      console.log(info);
-    }
-    console.log("path info : ", res.length);
-
     return res;
   }
   else//堵死了
@@ -161,4 +154,7 @@ function findPath(terrain)
   }
 }
 console.log('module terrain..');
-this.searchPath = function(){findPath(TerrainConfig);};
+this.searchPath = function()
+{
+  return findPath(TerrainConfig);
+};
