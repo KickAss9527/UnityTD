@@ -13,9 +13,9 @@ public class ServerMsg
 	public int exec;
 	public string uid;
 	public string[] config; //地形
-	public int iStartTag;
-	public int iEndTag;
-	public int[] arrPath;
+	public int start;
+	public int end;
+	public int[] path;
 }
 
 public class Server : Singleton<Server>  {
@@ -73,7 +73,7 @@ public class Server : Singleton<Server>  {
 	public void launch () 
 	{
 		clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-		IPAddress mIp = IPAddress.Parse("192.168.1.102");  
+		IPAddress mIp = IPAddress.Parse("192.168.1.103");  
 		IPEndPoint ip_end_point = new IPEndPoint(mIp, 8888);  
 
 		try {  
@@ -89,35 +89,6 @@ public class Server : Singleton<Server>  {
 
 		}
 		catch{ Debug.Log ("coonect failed");}
-
-
-
-//		string[] terrainStr = {
-//			"XXXXXXXOOOOO", 
-//			"XXXXXXXOOOOX",
-//			"XXXXXXXOOOOX",
-//			"XXXXXXXXOXXX",
-//			"XXXOOOOOOXXX",
-//			"XXXOXXXXXXXX",
-//			"XOOOXXXXXXXX",
-//			"XOOOXXXXXXXX",
-//			"XOOOXXXXXXXX",
-//			"OOOOXXXXXXXX",};
-//		Vector2 teSize = new Vector2 (terrainStr[0].Length, terrainStr.Length);
-//
-//		GameObject terrainParent = GameObject.Find ("terrain");
-//		GameObject tt = GameObject.Find ("groundTile");
-//		float dis = tt.transform.localScale.x*1.05f;
-//		for (int x = 0; x < teSize.x; x++) {
-//			for (int y = 0; y < teSize.y; y++) {
-//				if (terrainStr [y] [x] == 'X')
-//					continue;
-//				GameObject cube = GameObject.Instantiate (tt);
-//				cube.transform.parent = terrainParent.transform;
-//				cube.transform.position = new Vector3 ((teSize.x/2 - x)*dis, 0, (teSize.y/2-y)*dis);
-//			}
-//		}
-//		GameObject.Destroy (tt);
 
 	}
 
@@ -155,9 +126,9 @@ public class Server : Singleton<Server>  {
 		case Exec_Ready:
 			{
 				string[] strTerrain = data.config;
-				int[] arrPath = data.arrPath;
-				int start = data.iStartTag;
-				int end = data.iEndTag;
+				int[] arrPath = data.path;
+				int start = data.start;
+				int end = data.end;
 
 				GameManager.Instance.setupConfig (strTerrain, start, end, arrPath);
 			}

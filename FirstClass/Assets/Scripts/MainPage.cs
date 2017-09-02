@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class MainPage : MonoBehaviour {
+	
 	public Button btnReady;
 	// Use this for initialization
 	void Start () {
