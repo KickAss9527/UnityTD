@@ -15,6 +15,7 @@ public class MainPage : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		
+
 	}
 
 	private void onClick()

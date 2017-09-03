@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Enemy : MonoBehaviour {
-	public float fSpeed = 14.5f;
+	public float fSpeed = 10.5f;
 	int iCurIdx = 0;
 	Vector3 vTargetPos;
 	// Use this for initialization
@@ -44,7 +44,6 @@ public class Enemy : MonoBehaviour {
 					iCurIdx = -99;
 					return false;
 				} else {
-					Debug.Log ("move to next " + iCurIdx.ToString());
 					vTargetPos = getTargetPos (iCurIdx);
 				}
 			}

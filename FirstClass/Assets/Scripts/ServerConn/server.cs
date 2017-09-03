@@ -26,9 +26,14 @@ public class Server : Singleton<Server>  {
 //		//invoke when socket opened
 //		Debug.Log ("open");
 //	}
+	enum Exec{
+		Enter = 1000,
+		Ready = 1001,
+		Build = 1002,
+		UpdatePath = 1003,
 
-	private const int Exec_Enter = 1000;
-	private const int Exec_Ready = 1001;
+		End = 2000
+	};
 	private string tmpMsg;
 	private Socket clientSocket;
 	private string strPlayerID;
@@ -69,7 +74,11 @@ public class Server : Singleton<Server>  {
 			}  
 		}  
 	}     
-
+	string getExecStr(Exec en)
+	{
+		int v = (int)en;
+		return v.ToString ();
+	}
 	public void launch () 
 	{
 		clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
@@ -83,8 +92,7 @@ public class Server : Singleton<Server>  {
 			Thread th = new Thread(new ThreadStart(ReceiveSocket));
 			th.IsBackground = true;
 			th.Start();
-
-			sendMsg("{\"exec\" : " + Exec_Enter.ToString () + "}");
+			sendMsg("{\"exec\" : " + getExecStr(Exec.Enter) + "}");
 
 
 		}
@@ -107,7 +115,13 @@ public class Server : Singleton<Server>  {
 
 	public void sendReady()
 	{
-		sendMsg ("{\"exec\" : " + Exec_Ready.ToString () + "}");
+		sendMsg ("{\"exec\" : " + getExecStr(Exec.Ready) + "}");
+	}
+	public void sendBuilding(int tileIdx)
+	{
+		string msg = "{\"exec\" : " + getExecStr(Exec.Build) + ",";
+		msg += "\"tileIdx\" : " + tileIdx.ToString() + "}";
+		sendMsg (msg);
 	}
 
 	// Update is called once per frame
@@ -116,14 +130,13 @@ public class Server : Singleton<Server>  {
 			return;
 		ServerMsg data = JsonUtility.FromJson<ServerMsg> (this.tmpMsg);
 		this.tmpMsg = null;
-		switch (data.exec) 
-		{
-		case Exec_Enter:
+		switch ((Exec)data.exec) {
+		case Exec.Enter:
 			{
 				this.strPlayerID = data.uid;
 			}
 			break;
-		case Exec_Ready:
+		case Exec.Ready:
 			{
 				string[] strTerrain = data.config;
 				int[] arrPath = data.path;
@@ -132,6 +145,19 @@ public class Server : Singleton<Server>  {
 
 				GameManager.Instance.setupConfig (strTerrain, start, end, arrPath);
 			}
+			break;
+		
+		case Exec.UpdatePath:
+			{
+				string[] strTerrain = data.config;
+				int[] arrPath = data.path;
+				int start = data.start;
+				int end = data.end;
+
+				GameManager.Instance.updateConfig (strTerrain, start, end, arrPath);
+			}
+			break;
+		default:
 			break;
 		}
 	}

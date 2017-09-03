@@ -57,6 +57,8 @@
      <Compile Include="Assets\Scripts\Public\GameManager.cs" />
      <Compile Include="Assets\Scripts\Public\Singleton.cs" />
      <Compile Include="Assets\Scripts\ServerConn\server.cs" />
+     <Compile Include="Assets\Scripts\Tile.cs" />
+     <Compile Include="Assets\Scripts\Tower.cs" />
  <Reference Include="UnityEngine.Analytics">
  <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/UnityAnalytics/UnityEngine.Analytics.dll</HintPath>
  </Reference>

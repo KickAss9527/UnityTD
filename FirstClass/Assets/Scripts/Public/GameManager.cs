@@ -43,4 +43,16 @@ public class GameManager : Singleton<GameManager> {
 		this.arrPath = path;
 		SceneManager.LoadScene ("Game");
 	}
+	public void updateConfig(string[] t, int start, int end, int[] path)
+	{
+		this.strTerrain = t;
+		this.iStartTag = start;
+		this.iEndTag = end;
+		this.arrPath = path;
+		//todo path changed, do sth to show update
+	}
+	public void sendBuilding(int tileIdx)
+	{
+		Server.Instance.sendBuilding (tileIdx);	
+	}
 }
