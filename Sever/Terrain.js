@@ -19,7 +19,20 @@ var PointA = new TerrainTile(new TerrainTilePoint(11, 0));
 var PointB = new TerrainTile(new TerrainTilePoint(0, 9));
 this.getStartPointTag = function(){return PointA.objPoint.tId;}
 this.getEndPointTag = function(){return PointB.objPoint.tId;}
-
+this.init = function()
+{
+  TerrainConfig = [
+   "XXXXXXXOOOOO", //0
+   "XXXXXXXOOOOX", //1
+   "XXXXXXXOOOOX", //2
+   "XXXXXXXXOXXX", //3
+   "XXXOOOOOOXXX", //4
+   "XXXOXXXXXXXX", //5
+   "XOOOXXXXXXXX", //6
+   "XOOOXXXXXXXX", //7
+   "XOOOXXXXXXXX", //8
+   "OOOOXXXXXXXX"];//9
+}
 this.updateConfigTileDisable = function(idx)
 {
   var x = idx%TerrainWidth;

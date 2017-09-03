@@ -66,4 +66,10 @@ public class Enemy : MonoBehaviour {
 			transform.position = Vector3.MoveTowards (transform.position, vTargetPos, fSpeed * Time.deltaTime);
 		}
 	}
+
+	void OnTriggerEnter(Collider collider)
+	{
+		Bullet bul = collider.transform.GetComponent<Bullet> ();
+		Debug.Log ("boom dmg : "+ bul.iDmg);
+	}
 }

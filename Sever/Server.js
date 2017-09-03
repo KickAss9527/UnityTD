@@ -17,6 +17,7 @@ var server = net.createServer(function(socket)
     switch (exc) {
       case Exec_Enter:
       {
+        Terrain.init();
         var msg =  "{\"exec\" : " + Exec_Enter.toString();
         msg += ", \"uid\" : " + PlayerID.toString() + "}";
         socket.write(msg);

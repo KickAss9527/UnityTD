@@ -26,4 +26,6 @@ public class MainPage : MonoBehaviour {
 
 		GameManager.Instance.playerReady ();
 	}
+
+
 }
