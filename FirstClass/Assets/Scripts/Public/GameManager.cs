@@ -55,4 +55,25 @@ public class GameManager : Singleton<GameManager> {
 	{
 		Server.Instance.sendBuilding (tileIdx);	
 	}
+
+	public Quaternion caculateAng(Vector3 source, Vector3 target)
+	{
+		float disX = Vector2.Distance (new Vector2(target.x, target.y), 
+			new Vector2(source.x, source.y));
+		float angX = Mathf.Acos ((source.y - target.y) / disX);
+//		Debug.Log (disX);
+		angX *= Mathf.Rad2Deg;
+
+		int dirX = source.x > target.x ? -1 : 1;
+		angX *= dirX;
+
+		float disZ = Vector2.Distance (new Vector2(target.z, target.y), 
+			new Vector2(source.z, source.y));
+		float angZ = Mathf.Acos ((source.y - target.y) / disZ);
+		angZ *= Mathf.Rad2Deg;
+		int dirZ = source.z > target.z ? 1 : -1;
+		angZ *= dirZ;
+
+		return Quaternion.Euler(new Vector3 (angZ, 0, 0*angX));
+	}
 }

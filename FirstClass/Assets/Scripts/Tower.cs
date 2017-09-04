@@ -5,6 +5,7 @@ using UnityEngine;
 public class Tower : MonoBehaviour {
 	float fFireCoolDown = 0f;
 	float fFireRate = 0.4f;
+	int iDmg = 6;
 	public GameObject prefBullet;
 	// Use this for initialization
 	void Start () {
@@ -26,12 +27,11 @@ public class Tower : MonoBehaviour {
 				Transform em = parent.GetChild (i);
 				Bullet obj = GameObject.Instantiate (prefBullet).GetComponent<Bullet> ();
 				obj.transform.parent = this.gameObject.transform.parent;
-				obj.iDmg = 5;
+				obj.iDmg = this.iDmg;
 				Vector3 pos = this.gameObject.transform.position;
-				pos.y = 40f;
+				pos.y += 10f;
 				obj.transform.position = pos;
 				obj.fly (em.position);
-
 				this.fFireCoolDown = this.fFireRate;
 
 			}
