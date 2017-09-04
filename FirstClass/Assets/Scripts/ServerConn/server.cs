@@ -4,8 +4,6 @@ using System.IO;
 using UnityEngine.UI;
 using System.Net.Sockets;
 using System.Net;  
-using System.Net.Sockets;  
-using System.IO;
 using System.Text;
 using System.Threading;
 using System;
@@ -15,6 +13,9 @@ public class ServerMsg
 	public int exec;
 	public string uid;
 	public string[] config; //地形
+	public int start;
+	public int end;
+	public int[] path;
 }
 
 public class Server : Singleton<Server>  {
@@ -25,10 +26,15 @@ public class Server : Singleton<Server>  {
 //		//invoke when socket opened
 //		Debug.Log ("open");
 //	}
+	enum Exec{
+		Enter = 1000,
+		Ready = 1001,
+		Build = 1002,
+		UpdatePath = 1003,
 
-	private const int Exec_Enter = 1000;
-	private const int Exec_Ready = 1001;
-
+		End = 2000
+	};
+	private string tmpMsg;
 	private Socket clientSocket;
 	private string strPlayerID;
 
@@ -68,11 +74,15 @@ public class Server : Singleton<Server>  {
 			}  
 		}  
 	}     
-
+	string getExecStr(Exec en)
+	{
+		int v = (int)en;
+		return v.ToString ();
+	}
 	public void launch () 
 	{
 		clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-		IPAddress mIp = IPAddress.Parse("192.168.1.101");  
+		IPAddress mIp = IPAddress.Parse("192.168.1.103");  
 		IPEndPoint ip_end_point = new IPEndPoint(mIp, 8888);  
 
 		try {  
@@ -82,63 +92,19 @@ public class Server : Singleton<Server>  {
 			Thread th = new Thread(new ThreadStart(ReceiveSocket));
 			th.IsBackground = true;
 			th.Start();
-
-			sendMsg("{\"exec\" : " + Exec_Enter.ToString () + "}");
+			sendMsg("{\"exec\" : " + getExecStr(Exec.Enter) + "}");
 
 
 		}
 		catch{ Debug.Log ("coonect failed");}
-
-
-
-//		string[] terrainStr = {
-//			"XXXXXXXOOOOO", 
-//			"XXXXXXXOOOOX",
-//			"XXXXXXXOOOOX",
-//			"XXXXXXXXOXXX",
-//			"XXXOOOOOOXXX",
-//			"XXXOXXXXXXXX",
-//			"XOOOXXXXXXXX",
-//			"XOOOXXXXXXXX",
-//			"XOOOXXXXXXXX",
-//			"OOOOXXXXXXXX",};
-//		Vector2 teSize = new Vector2 (terrainStr[0].Length, terrainStr.Length);
-//
-//		GameObject terrainParent = GameObject.Find ("terrain");
-//		GameObject tt = GameObject.Find ("groundTile");
-//		float dis = tt.transform.localScale.x*1.05f;
-//		for (int x = 0; x < teSize.x; x++) {
-//			for (int y = 0; y < teSize.y; y++) {
-//				if (terrainStr [y] [x] == 'X')
-//					continue;
-//				GameObject cube = GameObject.Instantiate (tt);
-//				cube.transform.parent = terrainParent.transform;
-//				cube.transform.position = new Vector3 ((teSize.x/2 - x)*dis, 0, (teSize.y/2-y)*dis);
-//			}
-//		}
-//		GameObject.Destroy (tt);
 
 	}
 
 	private void recvMsg(string msg)
 	{
 		Debug.Log (msg);
-		ServerMsg data = JsonUtility.FromJson<ServerMsg> (msg);
-		switch (data.exec) 
-		{
-		case Exec_Enter:
-			{
-				this.strPlayerID = data.uid;
-			}
-			break;
-		case Exec_Ready:
-			{
-				string[] strTerrain = data.config;
-				Debug.Log (strTerrain[0][2]);
-				Debug.Log (strTerrain[9][2]);
-			}
-			break;
-		}
+		this.tmpMsg = msg;
+
 	}
 
 	private void sendMsg(string msg)
@@ -149,11 +115,50 @@ public class Server : Singleton<Server>  {
 
 	public void sendReady()
 	{
-		sendMsg ("{\"exec\" : " + Exec_Ready.ToString () + "}");
+		sendMsg ("{\"exec\" : " + getExecStr(Exec.Ready) + "}");
+	}
+	public void sendBuilding(int tileIdx)
+	{
+		string msg = "{\"exec\" : " + getExecStr(Exec.Build) + ",";
+		msg += "\"tileIdx\" : " + tileIdx.ToString() + "}";
+		sendMsg (msg);
 	}
 
 	// Update is called once per frame
 	void Update () {
+		if (this.tmpMsg == null)
+			return;
+		ServerMsg data = JsonUtility.FromJson<ServerMsg> (this.tmpMsg);
+		this.tmpMsg = null;
+		switch ((Exec)data.exec) {
+		case Exec.Enter:
+			{
+				this.strPlayerID = data.uid;
+			}
+			break;
+		case Exec.Ready:
+			{
+				string[] strTerrain = data.config;
+				int[] arrPath = data.path;
+				int start = data.start;
+				int end = data.end;
+
+				GameManager.Instance.setupConfig (strTerrain, start, end, arrPath);
+			}
+			break;
 		
+		case Exec.UpdatePath:
+			{
+				string[] strTerrain = data.config;
+				int[] arrPath = data.path;
+				int start = data.start;
+				int end = data.end;
+
+				GameManager.Instance.updateConfig (strTerrain, start, end, arrPath);
+			}
+			break;
+		default:
+			break;
+		}
 	}
 }
