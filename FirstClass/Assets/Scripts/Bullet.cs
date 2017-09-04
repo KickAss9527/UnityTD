@@ -26,22 +26,21 @@ public class Bullet : MonoBehaviour {
 		this.vTargetPos = vTraget;
 		this.flgFly = true;
 
-		float dist = Vector3.Distance (transform.position, vTargetPos);
-		float deltaY = transform.position.y - vTargetPos.y;
-
-		float angY = Mathf.Cos (deltaY / dist);
-		angY *= Mathf.Rad2Deg;
-
-		Vector2 source = new Vector2 (transform.position.x, transform.position.z);
-		Vector2 tar = new Vector2 (vTargetPos.x, vTargetPos.z);
-		float angX = Mathf.Cos ((tar.y - source.y) / Vector2.Distance (source, tar));
+		float disX = Vector2.Distance (new Vector2(vTraget.x, vTraget.y), 
+			new Vector2(transform.position.x, transform.position.y));
+		float angX = Mathf.Acos ((transform.position.y - vTraget.y) / disX);
 		angX *= Mathf.Rad2Deg;
-		if (angX > 45) {
-			angX -= 90;
-		}
+		int dirX = transform.position.x > vTraget.x ? -1 : 1;
+		angX *= dirX;
 
-		transform.Rotate (angX-90, 0, angY); //angY - 90);
-//		Debug.Log (angX);
+		float disZ = Vector2.Distance (new Vector2(vTraget.z, vTraget.y), 
+			new Vector2(transform.position.z, transform.position.y));
+		float angZ = Mathf.Acos ((transform.position.y - vTraget.y) / disZ);
+		angZ *= Mathf.Rad2Deg;
+		int dirZ = transform.position.z > vTraget.z ? 1 : -1;
+		angZ *= dirZ;
+
+		this.transform.rotation = Quaternion.Euler(new Vector3 (angZ, 0, angX));
 	}
 
 

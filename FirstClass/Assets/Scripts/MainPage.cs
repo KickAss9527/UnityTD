@@ -4,17 +4,18 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class MainPage : MonoBehaviour {
-	
+
 	public Button btnReady;
+
 	// Use this for initialization
 	void Start () {
 		GameManager.Instance.startGame();
 		this.btnReady.onClick.AddListener (onClick);
+;
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		
 
 	}
 
