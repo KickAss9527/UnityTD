@@ -60,6 +60,7 @@
      <Compile Include="Assets\Scripts\ServerConn\server.cs" />
      <Compile Include="Assets\Scripts\Tile.cs" />
      <Compile Include="Assets\Scripts\Tower.cs" />
+     <Compile Include="Assets\Scripts\Tower_Slow.cs" />
  <Reference Include="UnityEngine.Analytics">
  <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/UnityAnalytics/UnityEngine.Analytics.dll</HintPath>
  </Reference>

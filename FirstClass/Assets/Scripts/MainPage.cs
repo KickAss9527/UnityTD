@@ -24,7 +24,7 @@ public class MainPage : MonoBehaviour {
 
 		Transform bul = GameObject.Find ("bullet").transform;
 		bul.rotation = GameManager.Instance.caculateAng (bul.position, round.position);
-		bul.rotation = Quaternion.Euler (Mathf.Sin (dt) * Mathf.Rad2Deg, 0, Mathf.Cos (dt) * Mathf.Rad2Deg);
+//		bul.rotation = Quaternion.Euler (Mathf.Sin (dt) * Mathf.Rad2Deg, 0, Mathf.Cos (dt) * Mathf.Rad2Deg);
 		Vector2 vec = new Vector2 (bul.rotation.x, bul.rotation.z);
 		Debug.Log (vec);
 		prevVec = vec;

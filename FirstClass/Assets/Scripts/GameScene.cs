@@ -8,6 +8,8 @@ public class GameScene : MonoBehaviour {
 	public GameObject prefTile;
 	public GameObject prefEnemy;
 	public GameObject prefTower;
+	public GameObject prefTower_Slow;
+
 	Tile objSelectedTile;
 	public GameObject panBuild;
 	// Use this for initialization
@@ -86,11 +88,14 @@ public class GameScene : MonoBehaviour {
 
 	}
 
-	public void Click()
+	public void Click(Transform ts)
 	{
 		this.objSelectedTile.flgHasTower = true;
 
-		Tower t = Instantiate (prefTower).GetComponent<Tower> ();
+		Tower t = null;
+		if (ts.name == "0") t = Instantiate (prefTower).GetComponent<Tower> ();
+		else if(ts.name == "1") t = Instantiate (prefTower_Slow).GetComponent<Tower> ();
+
 		Vector3 vec3 = this.objSelectedTile.transform.position;
 		vec3.y = 5;
 		t.transform.parent = GameObject.Find ("tower").transform;
