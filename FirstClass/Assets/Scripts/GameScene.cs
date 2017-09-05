@@ -62,10 +62,13 @@ public class GameScene : MonoBehaviour {
 				GameObject gameObj = hitInfo.collider.gameObject;
 				if (gameObj.tag == "Tile") {
 					Debug.Log (gameObj.name);
-					Tile t = gameObj.GetComponent<Tile>();
+					Tile t = gameObj.GetComponent<Tile> ();
 					this.evtSelectTile (t);
+				} else {
+					this.evtSelectTile (null);
 				}
 			}
+			else{this.evtSelectTile (null);}
 		}
 	}
 
