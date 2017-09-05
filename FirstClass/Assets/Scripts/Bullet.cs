@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour {
 
-	float fSpeed = 1000.0f;
+	float fSpeed = 700.0f;
 	public int iDmg = 0;
 	bool flgFly = false;
 	Vector3 vTargetPos;
@@ -25,7 +25,7 @@ public class Bullet : MonoBehaviour {
 	{
 		this.vTargetPos = vTraget;
 		this.flgFly = true;
-		this.transform.rotation = GameManager.Instance.caculateAng(transform.position, vTargetPos);
+		transform.rotation = Quaternion.LookRotation (vTraget - transform.position);
 	}
 
 
