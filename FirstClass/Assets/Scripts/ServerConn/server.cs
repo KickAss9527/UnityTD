@@ -82,8 +82,8 @@ public class Server : Singleton<Server>  {
 	public void launch () 
 	{
 		clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-//		IPAddress mIp = IPAddress.Parse("192.168.1.103");  
-		IPAddress mIp = IPAddress.Parse("192.168.1.74");  
+		IPAddress mIp = IPAddress.Parse("192.168.1.103");  
+//		IPAddress mIp = IPAddress.Parse("192.168.1.74");  
 		IPEndPoint ip_end_point = new IPEndPoint(mIp, 8888);  
 
 		try {  

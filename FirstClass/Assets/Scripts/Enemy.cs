@@ -1,11 +1,17 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Enemy : MonoBehaviour {
 	public float fSpeed = 10.5f;
 	int iCurIdx = 0;
 	Vector3 vTargetPos;
+	int iHealthValue = 100;
+	int iHealthCur = 0;
+	public GameObject preBar;
+	
+	Slider objSlider;
 	// Use this for initialization
 
 	Vector3 getTargetPos(int idx)
@@ -23,6 +29,10 @@ public class Enemy : MonoBehaviour {
 
 	void Start () 
 	{
+		this.iHealthCur = this.iHealthValue;
+		this.objSlider = Instantiate (preBar).GetComponent<Slider> ();
+		this.objSlider.transform.parent = GameObject.Find ("CanvasMain").transform;
+		this.updateHealthBar ();
 
 	}
 	public void move()
@@ -60,16 +70,42 @@ public class Enemy : MonoBehaviour {
 	{
 		if (checkMoveNext()) 
 		{
-//			Debug.Log (transform.position);
-//			Debug.Log (vTargetPos);
-//			Debug.Log ("----");
 			transform.position = Vector3.MoveTowards (transform.position, vTargetPos, fSpeed * Time.deltaTime);
 		}
+
+		Vector2 player2DPos = Camera.main.WorldToScreenPoint (transform.position);
+		player2DPos.y += 20f;
+		this.objSlider.transform.position = player2DPos;
 	}
 
 	void OnTriggerEnter(Collider collider)
 	{
 		Bullet bul = collider.transform.GetComponent<Bullet> ();
-		Debug.Log ("boom dmg : "+ bul.iDmg);
+		this.iHealthCur -= bul.iDmg;
+		Destroy (bul.gameObject);
+
+		this.updateHealthBar ();
+		this.checkDeath ();
+	}
+
+	void updateHealthBar()
+	{
+		float p = iHealthCur * 1f / iHealthValue;
+		this.objSlider.value = p;
+		Color co = Color.Lerp (Color.red, Color.green, p);
+		this.objSlider.fillRect.transform.GetComponent<Image> ().color = co;
+	}
+
+	void checkDeath()
+	{
+		if (iHealthCur > 0)
+			return;
+		this.goDie ();
+
+	}
+
+	void goDie(){
+		Destroy (this.objSlider.gameObject);
+		Destroy (this.gameObject);
 	}
 }
