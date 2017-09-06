@@ -23,8 +23,10 @@ public class Tile : MonoBehaviour {
 	public void evtSelect()
 	{
 		Debug.Log ("tile select");
+		this.transform.Find ("selection").gameObject.SetActive (true);
 	}
 
 	public void evtUnselect(){
+		this.transform.Find ("selection").gameObject.SetActive (false);
 	}
 }

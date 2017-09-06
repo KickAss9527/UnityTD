@@ -71,7 +71,7 @@ function TerrainTile(tileObj)
     this.iFValue = 0;//总距离
     this.objParent = null;
 }
-
+var defaultPath = null;
 function findPath(terrain)
 {
   PointB.objParent = null; //清空上次记录
@@ -172,12 +172,13 @@ function findPath(terrain)
         cur = cur.objParent;
     }
     res.reverse();
+    if (!defaultPath) defaultPath = res;
     return res;
   }
   else//堵死了
   {
     console.log("no available path..");
-    return null;
+    return defaultPath;
   }
 }
 console.log('module terrain..');

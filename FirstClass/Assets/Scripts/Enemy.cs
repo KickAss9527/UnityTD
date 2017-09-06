@@ -81,6 +81,8 @@ public class Enemy : MonoBehaviour {
 	void OnTriggerEnter(Collider collider)
 	{
 		Bullet bul = collider.transform.GetComponent<Bullet> ();
+		if (!bul)//撞到建筑物了
+			return;
 		this.iHealthCur -= bul.iDmg;
 		Destroy (bul.gameObject);
 
