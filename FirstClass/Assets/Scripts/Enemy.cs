@@ -7,7 +7,7 @@ public class Enemy : MonoBehaviour {
 	public float fSpeed = 10.5f;
 	int iCurIdx = 0;
 	Vector3 vTargetPos;
-	int iHealthValue = 100;
+	public int iHealthValue = 100;
 	int iHealthCur = 0;
 	public GameObject preBar;
 	
@@ -31,7 +31,7 @@ public class Enemy : MonoBehaviour {
 	{
 		this.iHealthCur = this.iHealthValue;
 		this.objSlider = Instantiate (preBar).GetComponent<Slider> ();
-		this.objSlider.transform.parent = GameObject.Find ("CanvasMain").transform;
+		this.objSlider.transform.SetParent(GameObject.Find ("CanvasMain").transform);
 		this.updateHealthBar ();
 
 	}
@@ -68,9 +68,12 @@ public class Enemy : MonoBehaviour {
 	// Update is called once per frame
 	void Update () 
 	{
-		if (checkMoveNext()) 
-		{
+		if (checkMoveNext ()) {
 			transform.position = Vector3.MoveTowards (transform.position, vTargetPos, fSpeed * Time.deltaTime);
+		}
+		else 
+		{
+			this.escapse ();
 		}
 
 		Vector2 player2DPos = Camera.main.WorldToScreenPoint (transform.position);
@@ -109,5 +112,10 @@ public class Enemy : MonoBehaviour {
 	void goDie(){
 		Destroy (this.objSlider.gameObject);
 		Destroy (this.gameObject);
+	}
+
+	void escapse()
+	{	
+		this.goDie ();
 	}
 }
