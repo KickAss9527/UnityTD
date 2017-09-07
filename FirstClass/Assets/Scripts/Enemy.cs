@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using DG.Tweening;
 
 public class Enemy : MonoBehaviour {
 	public float fSpeed = 10.5f;
@@ -34,6 +35,21 @@ public class Enemy : MonoBehaviour {
 		this.objSlider.transform.SetParent(GameObject.Find ("CanvasMain").transform);
 		this.updateHealthBar ();
 
+		this.tweenMoveFunc ();
+
+	}
+
+	void tweenMoveFunc()
+	{
+		if (iCurIdx > -99 && iCurIdx < GameManager.Instance.arrPath.Length) 
+		{
+			iCurIdx++;
+			Vector3 pos = getTargetPos (iCurIdx);
+			Sequence seq = DOTween.Sequence ();
+
+			seq.Append(transform.DOMove(pos, 1)).AppendCallback(new TweenCallback(tweenMoveFunc));
+		}
+
 	}
 	public void move()
 	{
@@ -46,17 +62,17 @@ public class Enemy : MonoBehaviour {
 	{
 		if (iCurIdx > -99 && iCurIdx < GameManager.Instance.arrPath.Length) 
 		{
-			Vector3 myPos = transform.position;
-			if (myPos == vTargetPos) 
-			{
-				iCurIdx++;
-				if (iCurIdx >= GameManager.Instance.arrPath.Length) {
-					iCurIdx = -99;
-					return false;
-				} else {
-					vTargetPos = getTargetPos (iCurIdx);
-				}
-			}
+//			Vector3 myPos = transform.position;
+//			if (myPos == vTargetPos) 
+//			{
+//				iCurIdx++;
+//				if (iCurIdx >= GameManager.Instance.arrPath.Length) {
+//					iCurIdx = -99;
+//					return false;
+//				} else {
+//					vTargetPos = getTargetPos (iCurIdx);
+//				}
+//			}
 			return true;
 		} 
 		else 
@@ -69,7 +85,8 @@ public class Enemy : MonoBehaviour {
 	void Update () 
 	{
 		if (checkMoveNext ()) {
-			transform.position = Vector3.MoveTowards (transform.position, vTargetPos, fSpeed * Time.deltaTime);
+//			transform.position = Vector3.MoveTowards (transform.position, vTargetPos, fSpeed * Time.deltaTime);
+
 		}
 		else 
 		{
