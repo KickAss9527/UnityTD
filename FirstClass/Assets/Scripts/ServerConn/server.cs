@@ -16,6 +16,14 @@ public class ServerMsg
 	public int start;
 	public int end;
 	public int[] path;
+	public string[] team;
+}
+
+public class EnemyConfig
+{
+	public string name;
+	public int health;
+	public int speed;
 }
 
 public class Server : Singleton<Server>  {
@@ -145,6 +153,20 @@ public class Server : Singleton<Server>  {
 				int end = data.end;
 
 				GameManager.Instance.setupConfig (strTerrain, start, end, arrPath);
+
+				EnemyConfig enA = new EnemyConfig ();
+				enA.name = "A";
+				enA.speed = 14;
+				enA.health = 100;
+
+				EnemyConfig enB = new EnemyConfig ();
+				enB.name = "B";
+				enB.speed = 6;
+				enB.health = 200;
+
+				EnemyConfig[] enemyCon = { enA, enB };
+	
+				GameManager.Instance.setupEnemyInfo (data.team, enemyCon);
 			}
 			break;
 		
@@ -154,8 +176,9 @@ public class Server : Singleton<Server>  {
 				int[] arrPath = data.path;
 				int start = data.start;
 				int end = data.end;
-
+				
 				GameManager.Instance.updateConfig (strTerrain, start, end, arrPath);
+
 			}
 			break;
 		default:

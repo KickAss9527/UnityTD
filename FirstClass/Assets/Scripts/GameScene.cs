@@ -9,6 +9,7 @@ public class GameScene : MonoBehaviour {
 	public GameObject prefEnemy;
 	public GameObject prefTower;
 	public GameObject prefTower_Slow;
+	int curWave = 0;
 
 	Tile objSelectedTile;
 	public GameObject panBuild;
@@ -16,9 +17,27 @@ public class GameScene : MonoBehaviour {
 	void Start () {
 		
 		this.loadGroundTile ();
-		this.loadEnemy ();
+
 		this.panBuild.SetActive (false);
+
+		StartCoroutine ("generateEnemies");
+
+	}
+
+	IEnumerator generateEnemies()
+	{
 		
+		for (int i = 0; i < GameManager.Instance.team.Length; i++) 
+		{
+			yield return new WaitForSeconds(5f);
+			string single = GameManager.Instance.team [i];
+			for (int j = 0; j < single.Length; j++) 
+			{
+				string name = single [j]+"";
+				this.loadEnemy (name);
+				yield return new WaitForSeconds(1f);
+			}
+		}
 	}
 
 	void loadGroundTile()
@@ -35,21 +54,30 @@ public class GameScene : MonoBehaviour {
 				if (terrainStr [y] [x] == 'X')
 					continue;
 				GameObject cube = GameObject.Instantiate (tt);
-				cube.transform.parent = terrainParent.transform;
+				cube.transform.SetParent(terrainParent.transform);
 				cube.transform.position = new Vector3 ((x - teSize.x/2)*dis, 0, (teSize.y/2 - y)*dis);
 				cube.name = GameManager.Instance.convertXY_ToId (new Vector2 (x, y)).ToString ();
 			}
 		}
 	}
 
-	void loadEnemy()
+	void loadEnemy(string name)
 	{
 		GameObject terrainParent = GameObject.Find ("terrain");
 		int startTag = GameManager.Instance.iStartTag;
 		GameObject startTile = terrainParent.transform.Find (startTag.ToString ()).gameObject;
 
 		Enemy en = Instantiate (prefEnemy).GetComponent<Enemy>();
-		en.transform.parent = GameObject.Find ("enemyParent").transform;
+		en.transform.SetParent(GameObject.Find ("enemyParent").transform);
+		for (int i = 0; i < GameManager.Instance.enemyConfig.Length; i++) {
+			EnemyConfig con = GameManager.Instance.enemyConfig [i];
+			if (con.name == name) {
+				en.iHealthValue = con.health;
+				en.fSpeed = con.speed;
+				break;
+			}
+		}
+
 		en.move ();
 	}
 	// Update is called once per frame
@@ -101,7 +129,7 @@ public class GameScene : MonoBehaviour {
 
 		Vector3 vec3 = this.objSelectedTile.transform.position;
 		vec3.y = 5;
-		t.transform.parent = GameObject.Find ("tower").transform;
+		t.transform.SetParent(GameObject.Find ("tower").transform);
 		t.transform.position = vec3;
 
 		GameManager.Instance.sendBuilding (int.Parse(this.objSelectedTile.name));

@@ -10,6 +10,9 @@ public class GameManager : Singleton<GameManager> {
 	public int iStartTag;
 	public int iEndTag;
 	public int[] arrPath;
+	public string[] team;
+	public EnemyConfig[] enemyConfig;
+
 	// Use this for initialization
 	void Start () {
 		
@@ -51,6 +54,14 @@ public class GameManager : Singleton<GameManager> {
 		this.arrPath = path;
 		//todo path changed, do sth to show update
 	}
+
+	public void setupEnemyInfo(string[] team, EnemyConfig[] enemyConfig)
+	{
+		this.enemyConfig = enemyConfig;
+		this.team = team;
+	}
+
+
 	public void sendBuilding(int tileIdx)
 	{
 		Server.Instance.sendBuilding (tileIdx);	

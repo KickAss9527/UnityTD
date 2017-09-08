@@ -31,7 +31,9 @@ var server = net.createServer(function(socket)
         msg += ", \"config\"  : " + config;
         msg += ", \"start\"   : " + Terrain.getStartPointTag().toString();
         msg += ", \"end\"     : " + Terrain.getEndPointTag().toString();
-        msg += ", \"path\"    : " + JSON.stringify(Terrain.searchPath()) + "}";
+        msg += ", \"path\"    : " + JSON.stringify(Terrain.searchPath());
+        msg += ", \"team\"    : " + JSON.stringify(Battle.getEnemyTeam()) + "}";
+        console.log(msg);
         socket.write(msg);
       }
       break;
@@ -62,3 +64,4 @@ server.listen(8888,function()
 });
 
 var Terrain = require('./Terrain.js');
+var Battle = require('./Battle.js');

@@ -6,7 +6,7 @@ public class Tower : MonoBehaviour {
 	float fFireCoolDown = 0f;
 	protected float fFireRate = 0.4f;
 	int iDmg = 6;
-	protected int iAtkRadius = 250;
+	protected int iAtkRadius = 50;
 	public GameObject prefBullet;
 	// Use this for initialization
 	void Start () {
@@ -31,6 +31,7 @@ public class Tower : MonoBehaviour {
 				if (!isEnemyInAtkArea (em))
 					continue;
 				attack (em);
+				break;
 
 			}
 		}

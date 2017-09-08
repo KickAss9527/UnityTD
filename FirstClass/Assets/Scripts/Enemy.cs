@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using DG.Tweening;
 
 public class Enemy : MonoBehaviour {
 	public float fSpeed = 10.5f;
 	int iCurIdx = 0;
 	Vector3 vTargetPos;
-	int iHealthValue = 100;
+	public int iHealthValue = 100;
 	int iHealthCur = 0;
 	public GameObject preBar;
 	
@@ -31,8 +32,23 @@ public class Enemy : MonoBehaviour {
 	{
 		this.iHealthCur = this.iHealthValue;
 		this.objSlider = Instantiate (preBar).GetComponent<Slider> ();
-		this.objSlider.transform.parent = GameObject.Find ("CanvasMain").transform;
+		this.objSlider.transform.SetParent(GameObject.Find ("CanvasMain").transform);
 		this.updateHealthBar ();
+
+		this.tweenMoveFunc ();
+
+	}
+
+	void tweenMoveFunc()
+	{
+		if (iCurIdx > -99 && iCurIdx < GameManager.Instance.arrPath.Length) 
+		{
+			iCurIdx++;
+			Vector3 pos = getTargetPos (iCurIdx);
+			Sequence seq = DOTween.Sequence ();
+
+			seq.Append(transform.DOMove(pos, 1)).AppendCallback(new TweenCallback(tweenMoveFunc));
+		}
 
 	}
 	public void move()
@@ -46,17 +62,17 @@ public class Enemy : MonoBehaviour {
 	{
 		if (iCurIdx > -99 && iCurIdx < GameManager.Instance.arrPath.Length) 
 		{
-			Vector3 myPos = transform.position;
-			if (myPos == vTargetPos) 
-			{
-				iCurIdx++;
-				if (iCurIdx >= GameManager.Instance.arrPath.Length) {
-					iCurIdx = -99;
-					return false;
-				} else {
-					vTargetPos = getTargetPos (iCurIdx);
-				}
-			}
+//			Vector3 myPos = transform.position;
+//			if (myPos == vTargetPos) 
+//			{
+//				iCurIdx++;
+//				if (iCurIdx >= GameManager.Instance.arrPath.Length) {
+//					iCurIdx = -99;
+//					return false;
+//				} else {
+//					vTargetPos = getTargetPos (iCurIdx);
+//				}
+//			}
 			return true;
 		} 
 		else 
@@ -68,9 +84,13 @@ public class Enemy : MonoBehaviour {
 	// Update is called once per frame
 	void Update () 
 	{
-		if (checkMoveNext()) 
+		if (checkMoveNext ()) {
+//			transform.position = Vector3.MoveTowards (transform.position, vTargetPos, fSpeed * Time.deltaTime);
+
+		}
+		else 
 		{
-			transform.position = Vector3.MoveTowards (transform.position, vTargetPos, fSpeed * Time.deltaTime);
+			this.escapse ();
 		}
 
 		Vector2 player2DPos = Camera.main.WorldToScreenPoint (transform.position);
@@ -109,5 +129,10 @@ public class Enemy : MonoBehaviour {
 	void goDie(){
 		Destroy (this.objSlider.gameObject);
 		Destroy (this.gameObject);
+	}
+
+	void escapse()
+	{	
+		this.goDie ();
 	}
 }
