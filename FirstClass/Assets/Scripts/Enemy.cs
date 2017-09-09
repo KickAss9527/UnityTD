@@ -13,6 +13,7 @@ public class Enemy : MonoBehaviour {
 	public GameObject preBar;
 	Sequence mySeq;
 	Slider objSlider;
+
 	// Use this for initialization
 
 	Vector3 getTargetPos(int idx)
@@ -30,13 +31,14 @@ public class Enemy : MonoBehaviour {
 
 	void Awake () 
 	{
-		this.iHealthCur = this.iHealthValue;
+		
 		this.iCurIdx = 0;
 		this.transform.position = getTargetPos (0);
 	}
 
 	void Start()
 	{
+		this.iHealthCur = this.iHealthValue;
 		this.objSlider = Instantiate (preBar).GetComponent<Slider> ();
 		this.objSlider.transform.SetParent(GameObject.Find ("CanvasMain").transform);
 		this.updateHealthBar ();

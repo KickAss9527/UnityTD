@@ -25,7 +25,9 @@ public class GameScene : Singleton<GameScene> {
 		StartCoroutine ("generateEnemies");
 
 	}
-
+	public float getTileScale(){
+		return prefTile.transform.localScale.x;
+	}
 	IEnumerator generateEnemies()
 	{
 		
@@ -109,21 +111,23 @@ public class GameScene : Singleton<GameScene> {
 					Debug.Log (gameObj.name);
 					Tile t = gameObj.GetComponent<Tile> ();
 					this.evtSelectTile (t);
-					this.UITower.SetActive (false);
+					this.evtSelectTower (null);
 				}
 				else if (gameObj.tag == "Tower")
 				{
 					Tower t = gameObj.GetComponent<Tower> ();
-					t.evtSelect ();
-					this.objSelectedTower = t;
+					this.evtSelectTower (t);
 					this.evtSelectTile (null);
-					this.UITower.SetActive (true);
 				}
 				else {
 					this.evtSelectTile (null);
+					this.evtSelectTower (null);
 				}
 			}
-			else{this.evtSelectTile (null);}
+			else{
+				this.evtSelectTile (null);
+				this.evtSelectTower (null);
+			}
 		}
 	}
 
@@ -146,6 +150,21 @@ public class GameScene : Singleton<GameScene> {
 
 	}
 
+	void evtSelectTower(Tower t)
+	{
+		if (t == null) 
+		{
+			this.UITower.SetActive (false);
+			if (objSelectedTower)
+				this.objSelectedTower.unSelect ();
+			return;
+		}
+		t.evtSelect ();
+		this.objSelectedTower = t;
+
+		this.UITower.SetActive (true);
+	}
+
 	public void Click(Transform ts)
 	{
 		string towerType="";
@@ -160,9 +179,8 @@ public class GameScene : Singleton<GameScene> {
 		else if (ts.name == "sell") {
 
 			GameManager.Instance.sendDeconstrucBuilding (objSelectedTower.tileId);
-
-			this.UITower.SetActive (false);
 			Destroy (objSelectedTower.gameObject);
+			this.UITower.SetActive (false);
 			this.objSelectedTower = null;
 			return;
 		}

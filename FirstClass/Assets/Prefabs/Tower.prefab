@@ -94,6 +94,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefBullet: {fileID: 1824221931967216, guid: c97fff408522a4fe08e27a9b3177a8e8, type: 2}
+  tileId: 0
+  circle: {fileID: 1637943787275430, guid: 93942eb49e32c4f6b89594e1f48a81a9, type: 2}
 --- !u!136 &136255407293550974
 CapsuleCollider:
   m_ObjectHideFlags: 1
