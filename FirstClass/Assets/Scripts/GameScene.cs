@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
-
+using DG.Tweening;
 public class GameScene : Singleton<GameScene> {
 	public GameObject prefTile;
 	public GameObject prefEnemy;
 	public GameObject prefTower;
 	public GameObject prefTower_Slow;
+
+	GameObject pathTrail;
+	Sequence pathTrailSeq;
 	int curWave = 0;
 
 	Tile objSelectedTile;
@@ -16,6 +19,38 @@ public class GameScene : Singleton<GameScene> {
 	public GameObject panBuild;
 	public GameObject UITower;
 	// Use this for initialization
+
+	float trailY = 1f;
+	void runPathTrail()
+	{
+		this.pathTrailSeq.Kill ();
+		GameObject terrainParent = GameObject.Find ("terrain");
+		this.pathTrailSeq = DOTween.Sequence ();
+		this.pathTrailSeq.SetLoops (-1);
+		this.pathTrail.SetActive (false);
+		Vector3 initPos;
+		for (int i = 0; i < GameManager.Instance.arrPath.Length; i++) {
+			int tID = GameManager.Instance.arrPath [i];
+			GameObject tile = terrainParent.transform.Find (tID.ToString ()).gameObject;
+			Vector3 pos = tile.transform.position;
+			if (i == 0) {
+				initPos = new Vector3 (pos.x, trailY, pos.z);
+				pathTrail.transform.position = new Vector3 (pos.x, trailY, pos.z);
+				this.pathTrailSeq.PrependCallback (() => {
+					pathTrail.SetActive (true);
+					Debug.Log("end");
+				});
+			} else {
+				this.pathTrailSeq.Append (pathTrail.transform.DOMove (new Vector3 (pos.x, trailY, pos.z), 0.15f));
+			}
+		}
+		this.pathTrailSeq.AppendCallback (()=>{
+			this.pathTrail.SetActive(false);
+		});
+		this.pathTrailSeq.AppendInterval (1f);
+		
+	}
+
 	void Start () {
 		
 		this.loadGroundTile ();
@@ -23,8 +58,12 @@ public class GameScene : Singleton<GameScene> {
 		this.panBuild.SetActive (false);
 		this.UITower.SetActive (false);
 		StartCoroutine ("generateEnemies");
+		this.pathTrail = GameObject.Find ("Trail");
 
+		this.runPathTrail ();
 	}
+
+
 	public float getTileScale(){
 		return prefTile.transform.localScale.x;
 	}
@@ -76,7 +115,7 @@ public class GameScene : Singleton<GameScene> {
 				continue;
 			en.updatePath ();
 		}
-
+		this.runPathTrail ();
 	}
 
 	void loadEnemy(string name)
