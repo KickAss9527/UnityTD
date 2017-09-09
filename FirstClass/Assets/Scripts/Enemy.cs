@@ -11,7 +11,7 @@ public class Enemy : MonoBehaviour {
 	public int iHealthValue = 100;
 	int iHealthCur = 0;
 	public GameObject preBar;
-	
+	Sequence mySeq;
 	Slider objSlider;
 	// Use this for initialization
 
@@ -28,14 +28,36 @@ public class Enemy : MonoBehaviour {
 		return pos;
 	}
 
-	void Start () 
+	void Awake () 
 	{
 		this.iHealthCur = this.iHealthValue;
+		this.iCurIdx = 0;
+		this.transform.position = getTargetPos (0);
+	}
+
+	void Start()
+	{
 		this.objSlider = Instantiate (preBar).GetComponent<Slider> ();
 		this.objSlider.transform.SetParent(GameObject.Find ("CanvasMain").transform);
 		this.updateHealthBar ();
+	}
 
-		this.tweenMoveFunc ();
+	public void updatePath()
+	{
+		DOTween.Kill(transform);
+		Vector3 tmpPos;
+		float distance = 9999999f;
+		int idx = -1;
+		for (int i = 0; i < GameManager.Instance.arrPath.Length; i++) {
+			tmpPos = getTargetPos (i);
+			float tmpDis = Vector3.Distance(tmpPos, transform.position);
+			if (tmpDis <= distance) {
+				idx = i;
+				distance = tmpDis;
+			}
+		}
+		this.iCurIdx = idx-1;
+		this.move ();
 
 	}
 
@@ -45,34 +67,18 @@ public class Enemy : MonoBehaviour {
 		{
 			iCurIdx++;
 			Vector3 pos = getTargetPos (iCurIdx);
-			Sequence seq = DOTween.Sequence ();
-
-			seq.Append(transform.DOMove(pos, 1)).AppendCallback(new TweenCallback(tweenMoveFunc));
+			float dur = Vector3.Distance (pos, transform.position) / fSpeed;
+			transform.DOMove (pos, dur).OnComplete (tweenMoveFunc);
 		}
 
 	}
-	public void move()
-	{
-		transform.position = getTargetPos (0);
-		vTargetPos = transform.position;
-		this.iCurIdx = -1;
-		this.checkMoveNext ();
+	public void move(){
+		this.tweenMoveFunc ();
 	}
 	bool checkMoveNext()
 	{
 		if (iCurIdx > -99 && iCurIdx < GameManager.Instance.arrPath.Length) 
 		{
-//			Vector3 myPos = transform.position;
-//			if (myPos == vTargetPos) 
-//			{
-//				iCurIdx++;
-//				if (iCurIdx >= GameManager.Instance.arrPath.Length) {
-//					iCurIdx = -99;
-//					return false;
-//				} else {
-//					vTargetPos = getTargetPos (iCurIdx);
-//				}
-//			}
 			return true;
 		} 
 		else 
@@ -85,8 +91,6 @@ public class Enemy : MonoBehaviour {
 	void Update () 
 	{
 		if (checkMoveNext ()) {
-//			transform.position = Vector3.MoveTowards (transform.position, vTargetPos, fSpeed * Time.deltaTime);
-
 		}
 		else 
 		{

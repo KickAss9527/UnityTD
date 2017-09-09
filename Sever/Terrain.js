@@ -1,38 +1,33 @@
 //path ----------
 //12w x 10h
-
- TerrainConfig = [
-  "XXXXXXXOOOOO", //0
-  "XXXXXXXOOOOX", //1
-  "XXXXXXXOOOOX", //2
-  "XXXXXXXXOXXX", //3
-  "XXXOOOOOOXXX", //4
-  "XXXOXXXXXXXX", //5
-  "XOOOXXXXXXXX", //6
-  "XOOOXXXXXXXX", //7
-  "XOOOXXXXXXXX", //8
-  "OOOOXXXXXXXX"];//9
+var defaultTerrain = [
+ "XXXXXXOOOOOO", //0
+ "XXXXXXOOOOXO", //1
+ "XXXXXXOOOOXX", //2
+ "XXXXXXOOOOXX", //3
+ "XXXXXOOXXXXX", //4
+ "XXXXOOXXXXXX", //5
+ "XXXOOXXXXXXX", //6
+ "XXOOXXXXXXXX", //7
+ "XOOXXXXXXXXX", //8
+ "OOXXXXXXXXXX"];//9
+ var TerrainConfig;
+ this.init = function()
+ {
+   TerrainConfig = [9];
+   for (var i = 0; i < defaultTerrain.length; i++) {
+     TerrainConfig[i] = defaultTerrain[i];
+   }
+ }
+ this.init();
 // 0123456789
 var TerrainWidth = TerrainConfig[0].length;
 var TerrainHeight = TerrainConfig.length;
-var PointA = new TerrainTile(new TerrainTilePoint(11, 0));
+var PointA = new TerrainTile(new TerrainTilePoint(11, 1));
 var PointB = new TerrainTile(new TerrainTilePoint(0, 9));
 this.getStartPointTag = function(){return PointA.objPoint.tId;}
 this.getEndPointTag = function(){return PointB.objPoint.tId;}
-this.init = function()
-{
-  TerrainConfig = [
-   "XXXXXXXOOOOO", //0
-   "XXXXXXXOOOOX", //1
-   "XXXXXXXOOOOX", //2
-   "XXXXXXXXOXXX", //3
-   "XXXOOOOOOXXX", //4
-   "XXXOXXXXXXXX", //5
-   "XOOOXXXXXXXX", //6
-   "XOOOXXXXXXXX", //7
-   "XOOOXXXXXXXX", //8
-   "OOOOXXXXXXXX"];//9
-}
+
 this.updateConfigTileDisable = function(idx)
 {
   var x = idx%TerrainWidth;

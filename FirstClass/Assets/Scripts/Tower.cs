@@ -5,7 +5,7 @@ using UnityEngine;
 public class Tower : MonoBehaviour {
 	float fFireCoolDown = 0f;
 	protected float fFireRate = 0.4f;
-	int iDmg = 6;
+	int iDmg = 1;
 	protected int iAtkRadius = 50;
 	public GameObject prefBullet;
 	// Use this for initialization

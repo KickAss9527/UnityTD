@@ -53,6 +53,7 @@ public class GameManager : Singleton<GameManager> {
 		this.iEndTag = end;
 		this.arrPath = path;
 		//todo path changed, do sth to show update
+		GameScene.Instance.updateEnemyPath();
 	}
 
 	public void setupEnemyInfo(string[] team, EnemyConfig[] enemyConfig)

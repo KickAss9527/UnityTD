@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class GameScene : MonoBehaviour {
+public class GameScene : Singleton<GameScene> {
 	public GameObject prefTile;
 	public GameObject prefEnemy;
 	public GameObject prefTower;
@@ -61,6 +61,20 @@ public class GameScene : MonoBehaviour {
 		}
 	}
 
+	public void updateEnemyPath()
+	{
+		
+		Transform terrainParent = GameObject.Find ("enemyParent").transform;
+		for (int i = 0; i < terrainParent.childCount; i++) {
+			Transform ch = terrainParent.GetChild (i);
+			Enemy en = ch.GetComponent<Enemy>();
+			if (en == null)
+				continue;
+			en.updatePath ();
+		}
+
+	}
+
 	void loadEnemy(string name)
 	{
 		GameObject terrainParent = GameObject.Find ("terrain");
@@ -68,7 +82,7 @@ public class GameScene : MonoBehaviour {
 		GameObject startTile = terrainParent.transform.Find (startTag.ToString ()).gameObject;
 
 		Enemy en = Instantiate (prefEnemy).GetComponent<Enemy>();
-		en.transform.SetParent(GameObject.Find ("enemyParent").transform);
+
 		for (int i = 0; i < GameManager.Instance.enemyConfig.Length; i++) {
 			EnemyConfig con = GameManager.Instance.enemyConfig [i];
 			if (con.name == name) {
@@ -77,7 +91,7 @@ public class GameScene : MonoBehaviour {
 				break;
 			}
 		}
-
+		en.transform.SetParent(GameObject.Find ("enemyParent").transform);
 		en.move ();
 	}
 	// Update is called once per frame
