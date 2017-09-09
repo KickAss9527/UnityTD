@@ -3,6 +3,7 @@ var Exec_Enter = 1000;
 var Exec_Ready = 1001;
 var Exec_Build = 1002;
 var Exec_UpdatePath = 1003;
+var Exec_Deconstruct = 1004;
 var PlayerID = 9527;
 var net = require('net');
 var server = net.createServer(function(socket)
@@ -40,8 +41,22 @@ var server = net.createServer(function(socket)
       case Exec_Build:
       {
         var tileIdx = parseInt(json["tileIdx"]);
-        Terrain.updateConfigTileDisable(tileIdx);
+        Terrain.updateConfigTileEnable(tileIdx, 0);
 
+        var msg =  "{\"exec\" : " + Exec_UpdatePath.toString();
+        var config = JSON.stringify(Terrain.getTerrainConfig());
+        console.log(config);
+        msg += ", \"config\"  : " + config;
+        msg += ", \"start\"   : " + Terrain.getStartPointTag().toString();
+        msg += ", \"end\"     : " + Terrain.getEndPointTag().toString();
+        msg += ", \"path\"    : " + JSON.stringify(Terrain.searchPath()) + "}";
+        socket.write(msg);
+      }
+      break;
+      case Exec_Deconstruct:
+      {
+        var tileIdx = parseInt(json["tileIdx"]);
+        Terrain.updateConfigTileEnable(tileIdx, 1);
         var msg =  "{\"exec\" : " + Exec_UpdatePath.toString();
         var config = JSON.stringify(Terrain.getTerrainConfig());
         console.log(config);

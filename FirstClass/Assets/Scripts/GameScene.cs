@@ -12,14 +12,16 @@ public class GameScene : Singleton<GameScene> {
 	int curWave = 0;
 
 	Tile objSelectedTile;
+	Tower objSelectedTower;
 	public GameObject panBuild;
+	public GameObject UITower;
 	// Use this for initialization
 	void Start () {
 		
 		this.loadGroundTile ();
 
 		this.panBuild.SetActive (false);
-
+		this.UITower.SetActive (false);
 		StartCoroutine ("generateEnemies");
 
 	}
@@ -102,11 +104,22 @@ public class GameScene : Singleton<GameScene> {
 			RaycastHit hitInfo;
 			if (Physics.Raycast (ray, out hitInfo)) {
 				GameObject gameObj = hitInfo.collider.gameObject;
-				if (gameObj.tag == "Tile") {
+				if (gameObj.tag == "Tile") 
+				{
 					Debug.Log (gameObj.name);
 					Tile t = gameObj.GetComponent<Tile> ();
 					this.evtSelectTile (t);
-				} else {
+					this.UITower.SetActive (false);
+				}
+				else if (gameObj.tag == "Tower")
+				{
+					Tower t = gameObj.GetComponent<Tower> ();
+					t.evtSelect ();
+					this.objSelectedTower = t;
+					this.evtSelectTile (null);
+					this.UITower.SetActive (true);
+				}
+				else {
 					this.evtSelectTile (null);
 				}
 			}
@@ -135,18 +148,32 @@ public class GameScene : Singleton<GameScene> {
 
 	public void Click(Transform ts)
 	{
-		this.objSelectedTile.flgHasTower = true;
-
+		string towerType="";
 		Tower t = null;
-		if (ts.name == "0") t = Instantiate (prefTower).GetComponent<Tower> ();
-		else if(ts.name == "1") t = Instantiate (prefTower_Slow).GetComponent<Tower> ();
+		if (ts.name == "0") {
+			t = Instantiate (prefTower).GetComponent<Tower> ();
+			towerType = "Tower";
+		} else if (ts.name == "1") {
+			t = Instantiate (prefTower_Slow).GetComponent<Tower> ();
+			towerType = "Tower_Slower";
+		}
+		else if (ts.name == "sell") {
 
+			GameManager.Instance.sendDeconstrucBuilding (objSelectedTower.tileId);
+
+			this.UITower.SetActive (false);
+			Destroy (objSelectedTower.gameObject);
+			this.objSelectedTower = null;
+			return;
+		}
+
+		this.objSelectedTile.flgHasTower = true;
 		Vector3 vec3 = this.objSelectedTile.transform.position;
 		vec3.y = 5;
 		t.transform.SetParent(GameObject.Find ("tower").transform);
 		t.transform.position = vec3;
-
-		GameManager.Instance.sendBuilding (int.Parse(this.objSelectedTile.name));
+		t.tileId = int.Parse(objSelectedTile.name);
+		GameManager.Instance.sendBuilding(int.Parse(this.objSelectedTile.name), towerType);
 		this.evtSelectTile (null);
 
 	}

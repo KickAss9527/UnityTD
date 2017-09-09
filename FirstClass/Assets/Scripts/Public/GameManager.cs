@@ -22,6 +22,7 @@ public class GameManager : Singleton<GameManager> {
 	void Update () {
 		
 	}
+
 	public int convertXY_ToId(Vector2 vec)
 	{
 		return (int)(vec.x + vec.y*strTerrain[0].Length);
@@ -63,9 +64,13 @@ public class GameManager : Singleton<GameManager> {
 	}
 
 
-	public void sendBuilding(int tileIdx)
+	public void sendBuilding(int tileIdx, string tower)
 	{
-		Server.Instance.sendBuilding (tileIdx);	
+		Server.Instance.sendBuilding (tileIdx, tower);	
+	}
+	public void sendDeconstrucBuilding(int tileIdx)
+	{
+		Server.Instance.sendDeconstructBuilding (tileIdx);	
 	}
 
 }

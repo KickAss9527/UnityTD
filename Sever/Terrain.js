@@ -28,7 +28,7 @@ var PointB = new TerrainTile(new TerrainTilePoint(0, 9));
 this.getStartPointTag = function(){return PointA.objPoint.tId;}
 this.getEndPointTag = function(){return PointB.objPoint.tId;}
 
-this.updateConfigTileDisable = function(idx)
+this.updateConfigTileEnable = function(idx, flgEnable)
 {
   var x = idx%TerrainWidth;
   var y = parseInt(idx/TerrainWidth);
@@ -40,7 +40,7 @@ this.updateConfigTileDisable = function(idx)
   console.log("x", x);
   console.log("y", y);
   var str = TerrainConfig[y];
-  str = str.substr(0, x) + "X" + str.substr(x+1, str.length);
+  str = str.substr(0, x) + (flgEnable==1 ? "O":"X") + str.substr(x+1, str.length);
   TerrainConfig[y] = str;
 }
 this.getTerrainConfig = function()

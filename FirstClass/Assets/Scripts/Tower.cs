@@ -8,6 +8,7 @@ public class Tower : MonoBehaviour {
 	int iDmg = 1;
 	protected int iAtkRadius = 50;
 	public GameObject prefBullet;
+	public int tileId;
 	// Use this for initialization
 	void Start () {
 	}
@@ -51,5 +52,10 @@ public class Tower : MonoBehaviour {
 		obj.transform.position = pos;
 		obj.fly (enemyTrans.position);
 		this.fFireCoolDown = this.fFireRate;
+	}
+
+	public void evtSelect()
+	{
+
 	}
 }

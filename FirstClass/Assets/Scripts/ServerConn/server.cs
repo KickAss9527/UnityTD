@@ -39,7 +39,7 @@ public class Server : Singleton<Server>  {
 		Ready = 1001,
 		Build = 1002,
 		UpdatePath = 1003,
-
+		Deconstruct = 1004,
 		End = 2000
 	};
 	private string tmpMsg;
@@ -126,9 +126,15 @@ public class Server : Singleton<Server>  {
 	{
 		sendMsg ("{\"exec\" : " + getExecStr(Exec.Ready) + "}");
 	}
-	public void sendBuilding(int tileIdx)
+	public void sendBuilding(int tileIdx, string tType)
 	{
 		string msg = "{\"exec\" : " + getExecStr(Exec.Build) + ",";
+		msg += "\"tower\" :\"" + tType + "\",";
+		msg += "\"tileIdx\" : " + tileIdx.ToString() + "}";
+		sendMsg (msg);
+	}
+	public void sendDeconstructBuilding(int tileIdx){
+		string msg = "{\"exec\" : " + getExecStr(Exec.Deconstruct) + ",";
 		msg += "\"tileIdx\" : " + tileIdx.ToString() + "}";
 		sendMsg (msg);
 	}
