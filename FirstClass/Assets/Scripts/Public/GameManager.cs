@@ -35,9 +35,14 @@ public class GameManager : Singleton<GameManager> {
 	{
 		Server.Instance.launch ();
 	}
-	public void playerReady()
+	public void playerReady(bool flgMultiple = false)
 	{
-		Server.Instance.sendReady ();
+		if (flgMultiple) 
+		{
+			Server.Instance.sendMultipleReady ();
+		} else {
+			Server.Instance.sendReady ();
+		}
 	}
 	public void setupConfig(string[] t, int start, int end, int[] path)
 	{

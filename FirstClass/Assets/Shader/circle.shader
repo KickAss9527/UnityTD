@@ -51,12 +51,18 @@
 			xy.x -= 0.5;
 			xy.y -= 0.5;
 			float sq = xy.x*xy.x + xy.y*xy.y;
-			if(sq < rOut && sq > rIn)
+
+			if(sq < rIn)
 			{
+				c.a = 0.1;
 			}
-			else
+			else if(sq > rOut)
 			{
 				c.a = 0;
+			}
+			else 
+			{
+				c.a = 1;
 			}
 			c.r = 0;
 			c.g = 1;

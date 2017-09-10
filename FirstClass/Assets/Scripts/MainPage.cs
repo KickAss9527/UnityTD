@@ -6,7 +6,7 @@ using DG.Tweening;
 public class MainPage : MonoBehaviour {
 
 	public Button btnReady;
-
+	public Button btnMultiple;
 	// Use this for initialization
 
 	float getBeizerValue(float start, float mid, float end, float t)
@@ -17,6 +17,8 @@ public class MainPage : MonoBehaviour {
 	void Start () {
 		GameManager.Instance.startGame();
 		this.btnReady.onClick.AddListener (onClick);
+		this.btnMultiple.onClick.AddListener (onMultipleClick);
+
 		Transform tow = GameObject.Find ("Cube").transform;
 //		DOTween.To (()=>tow.position, x=>tow.position = x, new Vector3(0, 100, 0), 3f);
 
@@ -31,7 +33,7 @@ public class MainPage : MonoBehaviour {
 										getBeizerValue(start.z, mid.z, end.z, v));
 		}, 1f, 3f);
 
-		
+
 		tow.DORotate (new Vector3 (0, 0, -90), 3f);
 	}
 
@@ -47,6 +49,13 @@ public class MainPage : MonoBehaviour {
 
 		GameManager.Instance.playerReady ();
 	}
+	private void onMultipleClick()
+	{
+		Text txt = this.btnReady.transform.Find("Text").GetComponent<Text> ();
+		txt.text = "Waiting...";
+		this.btnMultiple.enabled = false;
 
+		GameManager.Instance.playerReady (true);
+	}
 
 }

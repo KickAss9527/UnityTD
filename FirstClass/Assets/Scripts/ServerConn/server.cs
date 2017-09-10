@@ -40,6 +40,7 @@ public class Server : Singleton<Server>  {
 		Build = 1002,
 		UpdatePath = 1003,
 		Deconstruct = 1004,
+		MultipleGameReady = 1005,
 		End = 2000
 	};
 	private string tmpMsg;
@@ -125,6 +126,9 @@ public class Server : Singleton<Server>  {
 	public void sendReady()
 	{
 		sendMsg ("{\"exec\" : " + getExecStr(Exec.Ready) + "}");
+	}
+	public void sendMultipleReady(){
+		sendMsg ("{\"exec\" : " + getExecStr(Exec.MultipleGameReady) + "}");
 	}
 	public void sendBuilding(int tileIdx, string tType)
 	{

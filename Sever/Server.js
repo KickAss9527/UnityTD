@@ -4,7 +4,10 @@ var Exec_Ready = 1001;
 var Exec_Build = 1002;
 var Exec_UpdatePath = 1003;
 var Exec_Deconstruct = 1004;
-var PlayerID = 9527;
+var Exec_MultipleGameReady = 1005;
+
+var DefalutPlayerID = 9527;
+var PlayerID = DefalutPlayerID;
 var net = require('net');
 var server = net.createServer(function(socket)
 {
@@ -26,6 +29,19 @@ var server = net.createServer(function(socket)
       }
         break;
       case Exec_Ready:
+      {
+        var msg =  "{\"exec\" : " + Exec_Ready.toString();
+        var config = JSON.stringify(Terrain.getTerrainConfig());
+        msg += ", \"config\"  : " + config;
+        msg += ", \"start\"   : " + Terrain.getStartPointTag().toString();
+        msg += ", \"end\"     : " + Terrain.getEndPointTag().toString();
+        msg += ", \"path\"    : " + JSON.stringify(Terrain.searchPath());
+        msg += ", \"team\"    : " + JSON.stringify(Battle.getEnemyTeam()) + "}";
+        console.log(msg);
+        socket.write(msg);
+      }
+      break;
+      case Exec_MultipleGameReady:
       {
         var msg =  "{\"exec\" : " + Exec_Ready.toString();
         var config = JSON.stringify(Terrain.getTerrainConfig());

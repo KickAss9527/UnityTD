@@ -21,33 +21,43 @@ public class GameScene : Singleton<GameScene> {
 	// Use this for initialization
 
 	float trailY = 1f;
+
+	Vector3 getPathPos(int idx)
+	{
+		GameObject terrainParent = GameObject.Find ("terrain");
+		int tID = GameManager.Instance.arrPath [idx];
+		GameObject tile = terrainParent.transform.Find (tID.ToString ()).gameObject;
+		Vector3 pos = tile.transform.position;
+		return new Vector3 (pos.x, trailY, pos.z);
+	}
+
 	void runPathTrail()
 	{
-		this.pathTrailSeq.Kill ();
-		GameObject terrainParent = GameObject.Find ("terrain");
+		TrailRenderer tr = this.pathTrail.GetComponent<TrailRenderer> ();
+		tr.time = 0;
+
+		if (pathTrailSeq != null) {
+			this.pathTrailSeq.Kill ();
+			DOTween.Kill (pathTrail.transform);
+		}
+
+		this.pathTrail.transform.position = getPathPos (0);
+
 		this.pathTrailSeq = DOTween.Sequence ();
 		this.pathTrailSeq.SetLoops (-1);
-		this.pathTrail.SetActive (false);
-		Vector3 initPos;
-		for (int i = 0; i < GameManager.Instance.arrPath.Length; i++) {
-			int tID = GameManager.Instance.arrPath [i];
-			GameObject tile = terrainParent.transform.Find (tID.ToString ()).gameObject;
-			Vector3 pos = tile.transform.position;
-			if (i == 0) {
-				initPos = new Vector3 (pos.x, trailY, pos.z);
-				pathTrail.transform.position = new Vector3 (pos.x, trailY, pos.z);
-				this.pathTrailSeq.PrependCallback (() => {
-					pathTrail.SetActive (true);
-					Debug.Log("end");
-				});
-			} else {
-				this.pathTrailSeq.Append (pathTrail.transform.DOMove (new Vector3 (pos.x, trailY, pos.z), 0.15f));
-			}
+
+		this.pathTrailSeq. PrependInterval(0.5f);
+		this.pathTrailSeq.PrependCallback (()=>{
+			tr.time = 0.15f;
+		});
+		for (int i = 1; i < GameManager.Instance.arrPath.Length; i++) 
+		{
+			this.pathTrailSeq.Append (pathTrail.transform.DOMove (getPathPos(i), 0.15f));
 		}
 		this.pathTrailSeq.AppendCallback (()=>{
-			this.pathTrail.SetActive(false);
+			tr.time = 0;
 		});
-		this.pathTrailSeq.AppendInterval (1f);
+		this.pathTrailSeq.AppendInterval (0.5f);
 		
 	}
 
@@ -115,6 +125,8 @@ public class GameScene : Singleton<GameScene> {
 				continue;
 			en.updatePath ();
 		}
+		TrailRenderer tr = this.pathTrail.GetComponent<TrailRenderer> ();
+		tr.time = 0;
 		this.runPathTrail ();
 	}
 
@@ -191,11 +203,12 @@ public class GameScene : Singleton<GameScene> {
 
 	void evtSelectTower(Tower t)
 	{
+		if (objSelectedTower)
+			this.objSelectedTower.unSelect ();
 		if (t == null) 
 		{
 			this.UITower.SetActive (false);
-			if (objSelectedTower)
-				this.objSelectedTower.unSelect ();
+
 			return;
 		}
 		t.evtSelect ();

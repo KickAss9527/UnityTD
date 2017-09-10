@@ -1,16 +1,16 @@
 //path ----------
 //12w x 10h
 var defaultTerrain = [
- "XXXXXXOOOOOO", //0
- "XXXXXXOOOOXO", //1
- "XXXXXXOOOOXX", //2
- "XXXXXXOOOOXX", //3
- "XXXXXOOXXXXX", //4
- "XXXXOOXXXXXX", //5
- "XXXOOXXXXXXX", //6
- "XXOOXXXXXXXX", //7
- "XOOXXXXXXXXX", //8
- "OOXXXXXXXXXX"];//9
+ "XXXOOOOOOXXX", //0
+ "OOOOOXXXOOOO", //1
+ "OOOOOXXXOOXO", //2
+ "OOOXOXXXOXXO", //3
+ "OOOXOOOOOXXO", //4
+ "OOOXOOXOOOOO", //5
+ "OOOOOOXOOOOO", //6
+ "OOOOOOOOOOOO", //7
+ "OOOOOOXOOOOO", //8
+ "OOOOOOXOOOOO"];//9
  var TerrainConfig;
  this.init = function()
  {
@@ -23,8 +23,8 @@ var defaultTerrain = [
 // 0123456789
 var TerrainWidth = TerrainConfig[0].length;
 var TerrainHeight = TerrainConfig.length;
-var PointA = new TerrainTile(new TerrainTilePoint(11, 1));
-var PointB = new TerrainTile(new TerrainTilePoint(0, 9));
+var PointA = new TerrainTile(new TerrainTilePoint(11, 9));
+var PointB = new TerrainTile(new TerrainTilePoint(5, 9));
 this.getStartPointTag = function(){return PointA.objPoint.tId;}
 this.getEndPointTag = function(){return PointB.objPoint.tId;}
 
@@ -55,7 +55,8 @@ function TerrainTilePoint(x, y)
   this.tId = convertXYToId(x, y);
   this.getDistance = function(obj)
   {
-    return Math.pow(obj.iX - this.iX, 2) + Math.pow(obj.iY - this.iY, 2);
+    // return Math.pow(obj.iX - this.iX, 2) + Math.pow(obj.iY - this.iY, 2);
+    return Math.abs(obj.iX - this.iX) + Math.abs(obj.iY - this.iY);
   }
 }
 function TerrainTile(tileObj)
@@ -101,10 +102,30 @@ function findPath(terrain)
   }
 
   var neighborOffset = [[-1, 0], [0, -1], [1, 0], [0, 1]];//左 上 右 下
-  while (arrOpen.length > 0 && !PointB.objParent)
+  var minLen = 9999999;
+  while (arrOpen.length > 0)// && !PointB.objParent)
   {
-      var cur = arrOpen.pop();
+    var cur = null;
+     if(arrOpen.length > 1)
+     {
+       var idx = 0;
+       for (var i=0; i<arrOpen.length; i++)
+       {
+         if(!cur || cur.iFValue > arrOpen[i].iFValue)
+         {
+           cur = arrOpen[i];
+           idx = i;
+         }
+       }
+       arrOpen.splice(idx, 1);
+     }
+     else
+     {
+       cur = arrOpen.pop();
+     }
+
       arrClose.push(cur);
+
       for (var i = 0; i < neighborOffset.length; i++)
       {
         var offset = neighborOffset[i];
@@ -122,10 +143,11 @@ function findPath(terrain)
         var tmpTid = convertXYToId(tmpX, tmpY);
 
         //available path found
-        if (tmpTid == PointB.objPoint.tId)
+        if (tmpTid == PointB.objPoint.tId && cur.iFValue < minLen)
         {
           PointB.objParent = cur;
-          break;
+          minLen = cur.iFValue;
+          continue;
         }
 
         //不要
@@ -136,11 +158,11 @@ function findPath(terrain)
         {
           //需要重新计算，看有没有更短
           //a->c or a -> cur -> c, update gValue, c's parent -> cur
-          var dis_Cur_C = existTile.objPoint.getDistance(cur.objPoint);
-          if (dis_Cur_C + cur.iFromValue < existTile.iFromValue)
+
+          if (cur.iFromValue + 1 + existTile.iToValue < existTile.iFromValue)
           {
-              existTile.iFromValue = dis_Cur_C + cur.iFromValue;
-              existTile.iFValue = existTile.iFromValue + existTile.iToValue;
+              existTile.iFromValue = cur.iFromValue+1;
+              existTile.iFValue = cur.iFromValue + cur.iToValue;
               existTile.objParent = cur;
           }
         }
@@ -149,12 +171,13 @@ function findPath(terrain)
           var point = new TerrainTilePoint(tmpX, tmpY);
           var obj = new TerrainTile(point);
           obj.objParent = cur;
-          obj.iFromValue = point.getDistance(PointA.objPoint);
-          obj.iToValue = point.getDistance(PointB.objPoint);;
+          obj.iFromValue = cur.iFromValue + 1;
+          obj.iToValue = point.getDistance(PointB.objPoint);
           obj.iFValue = obj.iFromValue + obj.iToValue;
           arrOpen.push(obj);
         }
       }
+
   }
 
   if (PointB.objParent)//找到了
@@ -181,3 +204,4 @@ this.searchPath = function()
 {
   return findPath(TerrainConfig);
 };
+console.log(this.searchPath());
