@@ -6,7 +6,7 @@ public class Tower : MonoBehaviour {
 	float fFireCoolDown = 0f;
 	protected float fFireRate = 0.4f;
 	int iDmg = 1;
-	protected int iAtkRadius = 20;
+	protected int iAtkRadius = 30;
 	public GameObject prefBullet;
 	public int tileId;
 	public GameObject circle;
@@ -51,7 +51,7 @@ public class Tower : MonoBehaviour {
 		obj.iDmg = this.iDmg;
 		Vector3 pos = this.gameObject.transform.position;
 		obj.transform.position = pos;
-		obj.fly (enemyTrans.position);
+		obj.fly (enemyTrans);
 		this.fFireCoolDown = this.fFireRate;
 	}
 

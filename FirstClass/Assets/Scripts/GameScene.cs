@@ -33,14 +33,15 @@ public class GameScene : Singleton<GameScene> {
 
 	void runPathTrail()
 	{
-		TrailRenderer tr = this.pathTrail.GetComponent<TrailRenderer> ();
-		tr.time = 0;
+//		TrailRenderer tr = this.pathTrail.GetComponent<TrailRenderer> ();
+//		tr.time = 0;
 
 		if (pathTrailSeq != null) {
 			this.pathTrailSeq.Kill ();
-			DOTween.Kill (pathTrail.transform);
+//			DOTween.Kill (pathTrail.transform);
 		}
-
+		Transform par = pathTrail.transform.parent;
+		this.pathTrail.transform.SetParent(null);
 		this.pathTrail.transform.position = getPathPos (0);
 
 		this.pathTrailSeq = DOTween.Sequence ();
@@ -48,14 +49,16 @@ public class GameScene : Singleton<GameScene> {
 
 		this.pathTrailSeq. PrependInterval(0.5f);
 		this.pathTrailSeq.PrependCallback (()=>{
-			tr.time = 0.15f;
+//			tr.time = 0.15f;
+			pathTrail.transform.SetParent(par);
 		});
 		for (int i = 1; i < GameManager.Instance.arrPath.Length; i++) 
 		{
 			this.pathTrailSeq.Append (pathTrail.transform.DOMove (getPathPos(i), 0.15f));
 		}
 		this.pathTrailSeq.AppendCallback (()=>{
-			tr.time = 0;
+//			tr.time = 0;
+			this.pathTrail.transform.SetParent(null);
 		});
 		this.pathTrailSeq.AppendInterval (0.5f);
 		
@@ -116,7 +119,8 @@ public class GameScene : Singleton<GameScene> {
 
 	public void updateEnemyPath()
 	{
-		
+		this.pathTrail.transform.SetParent (null);
+//		this.runPathTrail ();
 		Transform terrainParent = GameObject.Find ("enemyParent").transform;
 		for (int i = 0; i < terrainParent.childCount; i++) {
 			Transform ch = terrainParent.GetChild (i);
@@ -126,8 +130,9 @@ public class GameScene : Singleton<GameScene> {
 			en.updatePath ();
 		}
 		TrailRenderer tr = this.pathTrail.GetComponent<TrailRenderer> ();
-		tr.time = 0;
-		this.runPathTrail ();
+//		tr.time = 0;
+
+
 	}
 
 	void loadEnemy(string name)
