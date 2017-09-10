@@ -9,6 +9,8 @@ var Exec_MultipleGameReady = 1005;
 var DefalutPlayerID = 9527;
 var PlayerID = DefalutPlayerID;
 var net = require('net');
+var clientList = [];
+var playerReadyCnt = 0;
 var server = net.createServer(function(socket)
 {
   socket.on('data', function(data)
@@ -26,6 +28,7 @@ var server = net.createServer(function(socket)
         msg += ", \"uid\" : " + PlayerID.toString() + "}";
         socket.write(msg);
         PlayerID++;
+        clientList.push(socket);
       }
         break;
       case Exec_Ready:
@@ -41,32 +44,41 @@ var server = net.createServer(function(socket)
         socket.write(msg);
       }
       break;
+
       case Exec_MultipleGameReady:
       {
-        var msg =  "{\"exec\" : " + Exec_Ready.toString();
-        var config = JSON.stringify(Terrain.getTerrainConfig());
-        msg += ", \"config\"  : " + config;
-        msg += ", \"start\"   : " + Terrain.getStartPointTag().toString();
-        msg += ", \"end\"     : " + Terrain.getEndPointTag().toString();
-        msg += ", \"path\"    : " + JSON.stringify(Terrain.searchPath());
-        msg += ", \"team\"    : " + JSON.stringify(Battle.getEnemyTeam()) + "}";
-        console.log(msg);
-        socket.write(msg);
+        playerReadyCnt++;
+        console.log("player : " + playerReadyCnt);
+        if(playerReadyCnt == 2)
+        {
+          var msg =  "{\"exec\" : " + Exec_Ready.toString();
+          var config = JSON.stringify(Terrain.getTerrainConfig());
+          msg += ", \"config\"  : " + config;
+          msg += ", \"start\"   : " + Terrain.getStartPointTag().toString();
+          msg += ", \"end\"     : " + Terrain.getEndPointTag().toString();
+          msg += ", \"path\"    : " + JSON.stringify(Terrain.searchPath());
+          msg += ", \"team\"    : " + JSON.stringify(Battle.getEnemyTeam()) + "}";
+          broadcastMsg(msg, null);
+        }
       }
       break;
       case Exec_Build:
       {
         var tileIdx = parseInt(json["tileIdx"]);
         Terrain.updateConfigTileEnable(tileIdx, 0);
+        var towerName = json["tower"];
 
         var msg =  "{\"exec\" : " + Exec_UpdatePath.toString();
+        msg += ", \"tower\"  : " + JSON.stringify(towerName);
+        msg += ", \"tileIdx\"  : " + json["tileIdx"];
+        msg += ", \"userID\"  : " + JSON.stringify(json["userID"]);
         var config = JSON.stringify(Terrain.getTerrainConfig());
-        console.log(config);
         msg += ", \"config\"  : " + config;
         msg += ", \"start\"   : " + Terrain.getStartPointTag().toString();
         msg += ", \"end\"     : " + Terrain.getEndPointTag().toString();
         msg += ", \"path\"    : " + JSON.stringify(Terrain.searchPath()) + "}";
-        socket.write(msg);
+        broadcastMsg(msg, null);
+
       }
       break;
       case Exec_Deconstruct:
@@ -75,12 +87,15 @@ var server = net.createServer(function(socket)
         Terrain.updateConfigTileEnable(tileIdx, 1);
         var msg =  "{\"exec\" : " + Exec_UpdatePath.toString();
         var config = JSON.stringify(Terrain.getTerrainConfig());
+        msg += ", \"tileIdx\"  : " + json["tileIdx"];
+        msg += ", \"userID\"  : " + JSON.stringify(json["userID"]);
         console.log(config);
         msg += ", \"config\"  : " + config;
         msg += ", \"start\"   : " + Terrain.getStartPointTag().toString();
         msg += ", \"end\"     : " + Terrain.getEndPointTag().toString();
         msg += ", \"path\"    : " + JSON.stringify(Terrain.searchPath()) + "}";
-        socket.write(msg);
+
+        broadcastMsg(msg, null);
       }
       break;
       default:
@@ -88,11 +103,20 @@ var server = net.createServer(function(socket)
     }
   });
 });
-
+function broadcastMsg(msg, client)
+{
+  for(var i=0; i<clientList.length; i++)
+  {
+    if (client!=clientList[i])
+    {
+        clientList[i].write(msg);
+    }
+  }
+}
 server.listen(8888,function()
 {
     console.log(" opened server on address %j ", server.address());
 });
-
+function test(){console.log("en ? ");}
 var Terrain = require('./Terrain.js');
 var Battle = require('./Battle.js');

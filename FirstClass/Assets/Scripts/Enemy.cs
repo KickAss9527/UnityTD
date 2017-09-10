@@ -7,6 +7,7 @@ using DG.Tweening;
 public class Enemy : MonoBehaviour {
 	public float fSpeed = 10.5f;
 	int iCurIdx = 0;
+	int iTargetTileID;
 	Vector3 vTargetPos;
 	public int iHealthValue = 100;
 	int iHealthCur = 0;
@@ -52,6 +53,9 @@ public class Enemy : MonoBehaviour {
 		int idx = -1;
 		for (int i = 0; i < GameManager.Instance.arrPath.Length; i++) {
 			tmpPos = getTargetPos (i);
+			if (tmpPos.x == transform.position.x || tmpPos.y == transform.position.y) {
+				
+			}
 			float tmpDis = Vector3.Distance(tmpPos, transform.position);
 			if (tmpDis <= distance) {
 				idx = i;
@@ -69,6 +73,7 @@ public class Enemy : MonoBehaviour {
 		{
 			iCurIdx++;
 			Vector3 pos = getTargetPos (iCurIdx);
+			this.iTargetTileID = GameManager.Instance.arrPath [iCurIdx];
 			float dur = Vector3.Distance (pos, transform.position) / fSpeed;
 			transform.DOMove (pos, dur).OnComplete (tweenMoveFunc);
 		}

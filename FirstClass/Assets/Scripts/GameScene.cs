@@ -33,12 +33,8 @@ public class GameScene : Singleton<GameScene> {
 
 	void runPathTrail()
 	{
-//		TrailRenderer tr = this.pathTrail.GetComponent<TrailRenderer> ();
-//		tr.time = 0;
-
 		if (pathTrailSeq != null) {
 			this.pathTrailSeq.Kill ();
-//			DOTween.Kill (pathTrail.transform);
 		}
 		Transform par = pathTrail.transform.parent;
 		this.pathTrail.transform.SetParent(null);
@@ -49,7 +45,6 @@ public class GameScene : Singleton<GameScene> {
 
 		this.pathTrailSeq. PrependInterval(0.5f);
 		this.pathTrailSeq.PrependCallback (()=>{
-//			tr.time = 0.15f;
 			pathTrail.transform.SetParent(par);
 		});
 		for (int i = 1; i < GameManager.Instance.arrPath.Length; i++) 
@@ -57,7 +52,6 @@ public class GameScene : Singleton<GameScene> {
 			this.pathTrailSeq.Append (pathTrail.transform.DOMove (getPathPos(i), 0.15f));
 		}
 		this.pathTrailSeq.AppendCallback (()=>{
-//			tr.time = 0;
 			this.pathTrail.transform.SetParent(null);
 		});
 		this.pathTrailSeq.AppendInterval (0.5f);
@@ -119,8 +113,6 @@ public class GameScene : Singleton<GameScene> {
 
 	public void updateEnemyPath()
 	{
-		this.pathTrail.transform.SetParent (null);
-//		this.runPathTrail ();
 		Transform terrainParent = GameObject.Find ("enemyParent").transform;
 		for (int i = 0; i < terrainParent.childCount; i++) {
 			Transform ch = terrainParent.GetChild (i);
@@ -129,10 +121,9 @@ public class GameScene : Singleton<GameScene> {
 				continue;
 			en.updatePath ();
 		}
-		TrailRenderer tr = this.pathTrail.GetComponent<TrailRenderer> ();
-//		tr.time = 0;
 
 
+		this.runPathTrail ();
 	}
 
 	void loadEnemy(string name)
@@ -225,12 +216,9 @@ public class GameScene : Singleton<GameScene> {
 	public void Click(Transform ts)
 	{
 		string towerType="";
-		Tower t = null;
 		if (ts.name == "0") {
-			t = Instantiate (prefTower).GetComponent<Tower> ();
 			towerType = "Tower";
 		} else if (ts.name == "1") {
-			t = Instantiate (prefTower_Slow).GetComponent<Tower> ();
 			towerType = "Tower_Slower";
 		}
 		else if (ts.name == "sell") {
@@ -241,18 +229,49 @@ public class GameScene : Singleton<GameScene> {
 			this.objSelectedTower = null;
 			return;
 		}
-
-		this.objSelectedTile.flgHasTower = true;
-		Vector3 vec3 = this.objSelectedTile.transform.position;
-		vec3.y = 5;
-		t.transform.SetParent(GameObject.Find ("tower").transform);
-		t.transform.position = vec3;
-		t.tileId = int.Parse(objSelectedTile.name);
+			
+		this.buildTower (towerType, int.Parse (objSelectedTile.name));
 		GameManager.Instance.sendBuilding(int.Parse(this.objSelectedTile.name), towerType);
 		this.evtSelectTile (null);
 
 	}
 
+	void buildTower(string type, int tileId)
+	{
+		Tile tile = GameObject.Find ("terrain").transform.Find(tileId.ToString()).GetComponent<Tile>();
+		tile.flgHasTower = true;
+
+		GameObject gobj = type == "Tower" ? prefTower : prefTower_Slow;
+		Tower t = Instantiate (gobj).GetComponent<Tower> ();
+		Vector3 pos = tile.transform.position;
+		pos.y = 5;
+		t.transform.SetParent (GameObject.Find ("tower").transform);
+		t.transform.position = pos;
+		t.tileId = tileId;
+	}
+
+	public void recvBuildMsg(int tileId, string tower)
+	{
+		if(tower != null)
+		{
+			this.buildTower (tower, tileId);
+			Debug.Log ("building");
+		}
+		else
+		{
+			Debug.Log ("kill building");
+			Transform towerParent = GameObject.Find ("tower").transform;
+			for(int i=0; i<towerParent.childCount; i++)
+			{
+				Tower t = towerParent.GetChild(i).GetComponent<Tower>();
+				if(t.tileId == tileId)
+				{
+					Destroy(t.gameObject);
+					break;
+				}
+			}
+		}
+	}
 
 		
 }

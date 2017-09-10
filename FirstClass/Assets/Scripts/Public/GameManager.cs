@@ -68,6 +68,9 @@ public class GameManager : Singleton<GameManager> {
 		this.team = team;
 	}
 
+	public void recieveBuildingInfo(int tileId, string tower){
+		GameScene.Instance.recvBuildMsg (tileId, tower);
+	}
 
 	public void sendBuilding(int tileIdx, string tower)
 	{
