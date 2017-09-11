@@ -22,6 +22,7 @@ public class GameManager : Singleton<GameManager> {
 	void Update () {
 		
 	}
+
 	public int convertXY_ToId(Vector2 vec)
 	{
 		return (int)(vec.x + vec.y*strTerrain[0].Length);
@@ -34,9 +35,14 @@ public class GameManager : Singleton<GameManager> {
 	{
 		Server.Instance.launch ();
 	}
-	public void playerReady()
+	public void playerReady(bool flgMultiple = false)
 	{
-		Server.Instance.sendReady ();
+		if (flgMultiple) 
+		{
+			Server.Instance.sendMultipleReady ();
+		} else {
+			Server.Instance.sendReady ();
+		}
 	}
 	public void setupConfig(string[] t, int start, int end, int[] path)
 	{
@@ -53,6 +59,7 @@ public class GameManager : Singleton<GameManager> {
 		this.iEndTag = end;
 		this.arrPath = path;
 		//todo path changed, do sth to show update
+		GameScene.Instance.updateEnemyPath();
 	}
 
 	public void setupEnemyInfo(string[] team, EnemyConfig[] enemyConfig)
@@ -61,10 +68,17 @@ public class GameManager : Singleton<GameManager> {
 		this.team = team;
 	}
 
+	public void recieveBuildingInfo(int tileId, string tower){
+		GameScene.Instance.recvBuildMsg (tileId, tower);
+	}
 
-	public void sendBuilding(int tileIdx)
+	public void sendBuilding(int tileIdx, string tower)
 	{
-		Server.Instance.sendBuilding (tileIdx);	
+		Server.Instance.sendBuilding (tileIdx, tower);	
+	}
+	public void sendDeconstrucBuilding(int tileIdx)
+	{
+		Server.Instance.sendDeconstructBuilding (tileIdx);	
 	}
 
 }

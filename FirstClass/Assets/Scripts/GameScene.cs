@@ -3,27 +3,77 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
-
-public class GameScene : MonoBehaviour {
+using DG.Tweening;
+public class GameScene : Singleton<GameScene> {
 	public GameObject prefTile;
 	public GameObject prefEnemy;
 	public GameObject prefTower;
 	public GameObject prefTower_Slow;
+
+	GameObject pathTrail;
+	Sequence pathTrailSeq;
 	int curWave = 0;
 
 	Tile objSelectedTile;
+	Tower objSelectedTower;
 	public GameObject panBuild;
+	public GameObject UITower;
 	// Use this for initialization
+
+	float trailY = 1f;
+
+	Vector3 getPathPos(int idx)
+	{
+		GameObject terrainParent = GameObject.Find ("terrain");
+		int tID = GameManager.Instance.arrPath [idx];
+		GameObject tile = terrainParent.transform.Find (tID.ToString ()).gameObject;
+		Vector3 pos = tile.transform.position;
+		return new Vector3 (pos.x, trailY, pos.z);
+	}
+
+	void runPathTrail()
+	{
+		if (pathTrailSeq != null) {
+			this.pathTrailSeq.Kill ();
+		}
+		Transform par = pathTrail.transform.parent;
+		this.pathTrail.transform.SetParent(null);
+		this.pathTrail.transform.position = getPathPos (0);
+
+		this.pathTrailSeq = DOTween.Sequence ();
+		this.pathTrailSeq.SetLoops (-1);
+
+		this.pathTrailSeq. PrependInterval(0.5f);
+		this.pathTrailSeq.PrependCallback (()=>{
+			pathTrail.transform.SetParent(par);
+		});
+		for (int i = 1; i < GameManager.Instance.arrPath.Length; i++) 
+		{
+			this.pathTrailSeq.Append (pathTrail.transform.DOMove (getPathPos(i), 0.15f));
+		}
+		this.pathTrailSeq.AppendCallback (()=>{
+			this.pathTrail.transform.SetParent(null);
+		});
+		this.pathTrailSeq.AppendInterval (0.5f);
+		
+	}
+
 	void Start () {
 		
 		this.loadGroundTile ();
 
 		this.panBuild.SetActive (false);
-
+		this.UITower.SetActive (false);
 		StartCoroutine ("generateEnemies");
+		this.pathTrail = GameObject.Find ("Trail");
 
+		this.runPathTrail ();
 	}
 
+
+	public float getTileScale(){
+		return prefTile.transform.localScale.x;
+	}
 	IEnumerator generateEnemies()
 	{
 		
@@ -61,6 +111,21 @@ public class GameScene : MonoBehaviour {
 		}
 	}
 
+	public void updateEnemyPath()
+	{
+		Transform terrainParent = GameObject.Find ("enemyParent").transform;
+		for (int i = 0; i < terrainParent.childCount; i++) {
+			Transform ch = terrainParent.GetChild (i);
+			Enemy en = ch.GetComponent<Enemy>();
+			if (en == null)
+				continue;
+			en.updatePath ();
+		}
+
+
+		this.runPathTrail ();
+	}
+
 	void loadEnemy(string name)
 	{
 		GameObject terrainParent = GameObject.Find ("terrain");
@@ -68,7 +133,7 @@ public class GameScene : MonoBehaviour {
 		GameObject startTile = terrainParent.transform.Find (startTag.ToString ()).gameObject;
 
 		Enemy en = Instantiate (prefEnemy).GetComponent<Enemy>();
-		en.transform.SetParent(GameObject.Find ("enemyParent").transform);
+
 		for (int i = 0; i < GameManager.Instance.enemyConfig.Length; i++) {
 			EnemyConfig con = GameManager.Instance.enemyConfig [i];
 			if (con.name == name) {
@@ -77,7 +142,7 @@ public class GameScene : MonoBehaviour {
 				break;
 			}
 		}
-
+		en.transform.SetParent(GameObject.Find ("enemyParent").transform);
 		en.move ();
 	}
 	// Update is called once per frame
@@ -88,15 +153,28 @@ public class GameScene : MonoBehaviour {
 			RaycastHit hitInfo;
 			if (Physics.Raycast (ray, out hitInfo)) {
 				GameObject gameObj = hitInfo.collider.gameObject;
-				if (gameObj.tag == "Tile") {
+				if (gameObj.tag == "Tile") 
+				{
 					Debug.Log (gameObj.name);
 					Tile t = gameObj.GetComponent<Tile> ();
 					this.evtSelectTile (t);
-				} else {
+					this.evtSelectTower (null);
+				}
+				else if (gameObj.tag == "Tower")
+				{
+					Tower t = gameObj.GetComponent<Tower> ();
+					this.evtSelectTower (t);
 					this.evtSelectTile (null);
 				}
+				else {
+					this.evtSelectTile (null);
+					this.evtSelectTower (null);
+				}
 			}
-			else{this.evtSelectTile (null);}
+			else{
+				this.evtSelectTile (null);
+				this.evtSelectTower (null);
+			}
 		}
 	}
 
@@ -119,24 +197,81 @@ public class GameScene : MonoBehaviour {
 
 	}
 
+	void evtSelectTower(Tower t)
+	{
+		if (objSelectedTower)
+			this.objSelectedTower.unSelect ();
+		if (t == null) 
+		{
+			this.UITower.SetActive (false);
+
+			return;
+		}
+		t.evtSelect ();
+		this.objSelectedTower = t;
+
+		this.UITower.SetActive (true);
+	}
+
 	public void Click(Transform ts)
 	{
-		this.objSelectedTile.flgHasTower = true;
+		string towerType="";
+		if (ts.name == "0") {
+			towerType = "Tower";
+		} else if (ts.name == "1") {
+			towerType = "Tower_Slower";
+		}
+		else if (ts.name == "sell") {
 
-		Tower t = null;
-		if (ts.name == "0") t = Instantiate (prefTower).GetComponent<Tower> ();
-		else if(ts.name == "1") t = Instantiate (prefTower_Slow).GetComponent<Tower> ();
-
-		Vector3 vec3 = this.objSelectedTile.transform.position;
-		vec3.y = 5;
-		t.transform.SetParent(GameObject.Find ("tower").transform);
-		t.transform.position = vec3;
-
-		GameManager.Instance.sendBuilding (int.Parse(this.objSelectedTile.name));
+			GameManager.Instance.sendDeconstrucBuilding (objSelectedTower.tileId);
+			Destroy (objSelectedTower.gameObject);
+			this.UITower.SetActive (false);
+			this.objSelectedTower = null;
+			return;
+		}
+			
+		this.buildTower (towerType, int.Parse (objSelectedTile.name));
+		GameManager.Instance.sendBuilding(int.Parse(this.objSelectedTile.name), towerType);
 		this.evtSelectTile (null);
 
 	}
 
+	void buildTower(string type, int tileId)
+	{
+		Tile tile = GameObject.Find ("terrain").transform.Find(tileId.ToString()).GetComponent<Tile>();
+		tile.flgHasTower = true;
+
+		GameObject gobj = type == "Tower" ? prefTower : prefTower_Slow;
+		Tower t = Instantiate (gobj).GetComponent<Tower> ();
+		Vector3 pos = tile.transform.position;
+		pos.y = 5;
+		t.transform.SetParent (GameObject.Find ("tower").transform);
+		t.transform.position = pos;
+		t.tileId = tileId;
+	}
+
+	public void recvBuildMsg(int tileId, string tower)
+	{
+		if(tower != null)
+		{
+			this.buildTower (tower, tileId);
+			Debug.Log ("building");
+		}
+		else
+		{
+			Debug.Log ("kill building");
+			Transform towerParent = GameObject.Find ("tower").transform;
+			for(int i=0; i<towerParent.childCount; i++)
+			{
+				Tower t = towerParent.GetChild(i).GetComponent<Tower>();
+				if(t.tileId == tileId)
+				{
+					Destroy(t.gameObject);
+					break;
+				}
+			}
+		}
+	}
 
 		
 }

@@ -4,28 +4,34 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour {
 
-	float fSpeed = 700.0f;
+	float fSpeed = 150.0f;
 	public int iDmg = 0;
 	bool flgFly = false;
-	Vector3 vTargetPos;
+	Transform target;
 	// Use this for initialization
 	void Start () {
 //		Debug.Log ("create bullet");
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	void Update () 
+	{
+		if (target == null) {
+			Destroy (this.gameObject);
+			return;
+		}
 		if (flgFly) 
 		{
-			transform.position = Vector3.MoveTowards (transform.position, vTargetPos, fSpeed * Time.deltaTime);
+			transform.position = Vector3.MoveTowards (transform.position, target.position, fSpeed * Time.deltaTime);
+			transform.rotation = Quaternion.LookRotation (target.position - transform.position);
 		}
 	}
 
-	public void fly(Vector3 vTraget)
+	public void fly(Transform _target)
 	{
-		this.vTargetPos = vTraget;
+		this.target = _target;
 		this.flgFly = true;
-		transform.rotation = Quaternion.LookRotation (vTraget - transform.position);
+//		transform.rotation = Quaternion.LookRotation (vTraget - transform.position);
 	}
 
 

@@ -17,6 +17,9 @@ public class ServerMsg
 	public int end;
 	public int[] path;
 	public string[] team;
+	public string userID;
+	public string tower;
+	public int tileIdx;
 }
 
 public class EnemyConfig
@@ -39,7 +42,8 @@ public class Server : Singleton<Server>  {
 		Ready = 1001,
 		Build = 1002,
 		UpdatePath = 1003,
-
+		Deconstruct = 1004,
+		MultipleGameReady = 1005,
 		End = 2000
 	};
 	private string tmpMsg;
@@ -126,9 +130,20 @@ public class Server : Singleton<Server>  {
 	{
 		sendMsg ("{\"exec\" : " + getExecStr(Exec.Ready) + "}");
 	}
-	public void sendBuilding(int tileIdx)
+	public void sendMultipleReady(){
+		sendMsg ("{\"exec\" : " + getExecStr(Exec.MultipleGameReady) + "}");
+	}
+	public void sendBuilding(int tileIdx, string tType)
 	{
 		string msg = "{\"exec\" : " + getExecStr(Exec.Build) + ",";
+		msg += "\"userID\" :\"" + strPlayerID + "\",";
+		msg += "\"tower\" :\"" + tType + "\",";
+		msg += "\"tileIdx\" : " + tileIdx.ToString() + "}";
+		sendMsg (msg);
+	}
+	public void sendDeconstructBuilding(int tileIdx){
+		string msg = "{\"exec\" : " + getExecStr(Exec.Deconstruct) + ",";
+		msg += "\"userID\" :\"" + strPlayerID + "\",";
 		msg += "\"tileIdx\" : " + tileIdx.ToString() + "}";
 		sendMsg (msg);
 	}
@@ -176,8 +191,13 @@ public class Server : Singleton<Server>  {
 				int[] arrPath = data.path;
 				int start = data.start;
 				int end = data.end;
-				
+
 				GameManager.Instance.updateConfig (strTerrain, start, end, arrPath);
+				string userID = data.userID;
+				if (userID != this.strPlayerID)
+				{
+					GameManager.Instance.recieveBuildingInfo (data.tileIdx, data.tower);
+				}
 
 			}
 			break;

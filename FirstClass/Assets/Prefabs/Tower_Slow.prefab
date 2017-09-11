@@ -25,7 +25,7 @@ GameObject:
   - component: {fileID: 114094124987451164}
   m_Layer: 0
   m_Name: Tower_Slow
-  m_TagString: Untagged
+  m_TagString: Tower
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -94,6 +94,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefBullet: {fileID: 0}
+  tileId: 0
+  circle: {fileID: 1637943787275430, guid: 93942eb49e32c4f6b89594e1f48a81a9, type: 2}
 --- !u!136 &136659217351728862
 CapsuleCollider:
   m_ObjectHideFlags: 1

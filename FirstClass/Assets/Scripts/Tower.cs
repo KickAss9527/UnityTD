@@ -5,9 +5,11 @@ using UnityEngine;
 public class Tower : MonoBehaviour {
 	float fFireCoolDown = 0f;
 	protected float fFireRate = 0.4f;
-	int iDmg = 6;
-	protected int iAtkRadius = 50;
+	int iDmg = 1;
+	protected int iAtkRadius = 30;
 	public GameObject prefBullet;
+	public int tileId;
+	public GameObject circle;
 	// Use this for initialization
 	void Start () {
 	}
@@ -49,7 +51,30 @@ public class Tower : MonoBehaviour {
 		obj.iDmg = this.iDmg;
 		Vector3 pos = this.gameObject.transform.position;
 		obj.transform.position = pos;
-		obj.fly (enemyTrans.position);
+		obj.fly (enemyTrans);
 		this.fFireCoolDown = this.fFireRate;
+	}
+
+	public void evtSelect()
+	{
+		Circle cir = GameObject.Instantiate (circle).GetComponent<Circle> ();
+		cir.transform.SetParent (transform);
+
+		float scale = iAtkRadius / GameScene.Instance.getTileScale ();
+		cir.setupScale (scale/2);
+		cir.transform.localPosition = new Vector3 (0f, -1.11f, 0f);
+
+		cir.gameObject.name = "circle";
+
+	}
+	public void unSelect()
+	{
+		for (int i = 0; i < transform.childCount; i++) {
+			Transform tr = transform.GetChild(i);
+			if (tr.gameObject.name == "circle") 
+			{
+				Destroy (tr.gameObject);
+			}
+		}
 	}
 }
