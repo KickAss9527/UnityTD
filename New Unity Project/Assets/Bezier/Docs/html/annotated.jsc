@@ -1,0 +1,6 @@
+var annotated =
+[
+    [ "Bezier", "class_bezier.html", "class_bezier" ],
+    [ "BezierPath", "class_bezier_path.html", "class_bezier_path" ],
+    [ "BezierPath.PathPoint", "class_bezier_path_1_1_path_point.html", "class_bezier_path_1_1_path_point" ]
+];
