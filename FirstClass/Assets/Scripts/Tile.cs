@@ -7,7 +7,7 @@ public class Tile : MonoBehaviour {
 	public bool flgHasTower = false;
 	// Use this for initialization
 	void Start () {
-		Debug.Log ("ttile");
+
 	}
 	
 	// Update is called once per frame
@@ -29,4 +29,9 @@ public class Tile : MonoBehaviour {
 	public void evtUnselect(){
 		this.transform.Find ("selection").gameObject.SetActive (false);
 	}
+
+	void OnTriggerEnter(Collider collider)  
+	{  
+//		Destroy (gameObject);
+	}  
 }

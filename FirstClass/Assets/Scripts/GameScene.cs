@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using DG.Tweening;
+using UnityEngine.AI;
 public class GameScene : Singleton<GameScene> {
 	public GameObject prefTile;
 	public GameObject prefEnemy;
@@ -21,43 +22,37 @@ public class GameScene : Singleton<GameScene> {
 	// Use this for initialization
 
 	float trailY = 1f;
-
-	Vector3 getPathPos(int idx)
+	public Vector3 convertXYToPos(Vector2 vec)
 	{
-		GameObject terrainParent = GameObject.Find ("terrain");
-		int tID = GameManager.Instance.arrPath [idx];
-		GameObject tile = terrainParent.transform.Find (tID.ToString ()).gameObject;
-		Vector3 pos = tile.transform.position;
-		return new Vector3 (pos.x, trailY, pos.z);
+		return new Vector3 ((vec.x - 10) * 10 + 5f, 0f, (10 - vec.y) * 10 - 5f);
+	}
+
+	public Vector3 getStartPos()
+	{
+		Vector2 vec = GameManager.Instance.convertId_ToXY (GameManager.Instance.iStartTag);
+		Vector3 v = convertXYToPos (vec);
+		v.y = 2f;
+		return v;
+	}
+	public Vector3 getTargetPos(){
+		Vector2 vec = GameManager.Instance.convertId_ToXY (GameManager.Instance.iEndTag);
+		Vector3 v = convertXYToPos (vec);
+		v.y = 2f;
+		return v;
 	}
 
 	void runPathTrail()
 	{
-		if (pathTrailSeq != null) {
-			this.pathTrailSeq.Kill ();
-		}
-		Transform par = pathTrail.transform.parent;
-		this.pathTrail.transform.SetParent(null);
-		this.pathTrail.transform.position = getPathPos (0);
+		NavMeshAgent agent = pathTrail.GetComponent<NavMeshAgent> ();
+//		agent.isStopped = true;
+		this.pathTrail.transform.position = getStartPos ();
+		agent.SetDestination (getTargetPos ());
+//		agent.isStopped = false;
 
-		this.pathTrailSeq = DOTween.Sequence ();
-		this.pathTrailSeq.SetLoops (-1);
+		GameObject.Find ("enemy").transform.position = getStartPos ();
+		GameObject.Find ("enemy").GetComponent<NavMeshAgent> ().SetDestination (getTargetPos ());
 
-		this.pathTrailSeq. PrependInterval(0.5f);
-		this.pathTrailSeq.PrependCallback (()=>{
-			pathTrail.transform.SetParent(par);
-		});
-		for (int i = 1; i < GameManager.Instance.arrPath.Length; i++) 
-		{
-			this.pathTrailSeq.Append (pathTrail.transform.DOMove (getPathPos(i), 0.15f));
-		}
-		this.pathTrailSeq.AppendCallback (()=>{
-			this.pathTrail.transform.SetParent(null);
-		});
-		this.pathTrailSeq.AppendInterval (0.5f);
-		
 	}
-
 	void Start () {
 		
 		this.loadGroundTile ();
@@ -92,57 +87,52 @@ public class GameScene : Singleton<GameScene> {
 
 	void loadGroundTile()
 	{
-		string[] terrainStr = GameManager.Instance.strTerrain;
-		Vector2 teSize = new Vector2 (terrainStr[0].Length, terrainStr.Length);
-
 		GameObject terrainParent = GameObject.Find ("terrain");
-		GameObject tt = Instantiate (prefTile);
-		float dis = tt.transform.localScale.x*1.02f;
-		Destroy (tt);
-		for (int x = 0; x < teSize.x; x++) {
-			for (int y = 0; y < teSize.y; y++) {
-				if (terrainStr [y] [x] == 'X')
-					continue;
-				GameObject cube = GameObject.Instantiate (tt);
-				cube.transform.SetParent(terrainParent.transform);
-				cube.transform.position = new Vector3 ((x - teSize.x/2)*dis, 0, (teSize.y/2 - y)*dis);
-				cube.name = GameManager.Instance.convertXY_ToId (new Vector2 (x, y)).ToString ();
+		Transform ground = terrainParent.transform.Find ("ground");
+
+
+		for (int x = 0; x < ground.localScale.x; x++) {
+			for (int y = 0; y < ground.localScale.z; y++) 
+			{
+				Tile tile = Instantiate (prefTile).GetComponent<Tile> ();
+				tile.name = (x + y * ground.localScale.x).ToString();
+				tile.transform.position = new Vector3 ((x-10)*10 + 5f,  0f, (10-y)*10 - 5f);
+				tile.transform.SetParent (terrainParent.transform);
+				BoxCollider bc = tile.gameObject.GetComponent<BoxCollider> ();
+//				bc.isTrigger = true;
+
 			}
 		}
-	}
 
-	public void updateEnemyPath()
-	{
-		Transform terrainParent = GameObject.Find ("enemyParent").transform;
-		for (int i = 0; i < terrainParent.childCount; i++) {
-			Transform ch = terrainParent.GetChild (i);
-			Enemy en = ch.GetComponent<Enemy>();
-			if (en == null)
-				continue;
-			en.updatePath ();
+		for (int i = 0; i < ground.childCount; i++) {
+//			ground.GetChild (i).gameObject.SetActive (false);
 		}
-
-
-		this.runPathTrail ();
 	}
 
 	void loadEnemy(string name)
 	{
+		Vector3 dst = getTargetPos ();
+		Vector3 src = getStartPos ();
+		src.y = 1.4f;
+
 		GameObject terrainParent = GameObject.Find ("terrain");
 		int startTag = GameManager.Instance.iStartTag;
 		GameObject startTile = terrainParent.transform.Find (startTag.ToString ()).gameObject;
 
-		Enemy en = Instantiate (prefEnemy).GetComponent<Enemy>();
+		Enemy en = Instantiate (prefEnemy, src,  terrainParent.transform.rotation).GetComponent<Enemy>();
+		en.transform.SetParent(GameObject.Find ("enemyParent").transform);
 
 		for (int i = 0; i < GameManager.Instance.enemyConfig.Length; i++) {
 			EnemyConfig con = GameManager.Instance.enemyConfig [i];
 			if (con.name == name) {
 				en.iHealthValue = con.health;
 				en.fSpeed = con.speed;
+//				en.transform.position = src;
+				en.GetComponent<NavMeshAgent> ().SetDestination (dst);
 				break;
 			}
 		}
-		en.transform.SetParent(GameObject.Find ("enemyParent").transform);
+
 		en.move ();
 	}
 	// Update is called once per frame
@@ -175,6 +165,15 @@ public class GameScene : Singleton<GameScene> {
 				this.evtSelectTile (null);
 				this.evtSelectTower (null);
 			}
+		}
+
+		NavMeshAgent agent = pathTrail.GetComponent<NavMeshAgent> ();
+		float distance = Vector3.Distance (pathTrail.transform.position, agent.destination);
+//		Debug.Log (distance <= agent.stoppingDistance );
+		if (distance <= agent.stoppingDistance) 
+		{
+//			agent.isStopped = true;
+			this.runPathTrail ();
 		}
 	}
 

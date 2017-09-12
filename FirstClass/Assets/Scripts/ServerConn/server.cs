@@ -12,10 +12,8 @@ public class ServerMsg
 {
 	public int exec;
 	public string uid;
-	public string[] config; //地形
 	public int start;
 	public int end;
-	public int[] path;
 	public string[] team;
 	public string userID;
 	public string tower;
@@ -162,12 +160,10 @@ public class Server : Singleton<Server>  {
 			break;
 		case Exec.Ready:
 			{
-				string[] strTerrain = data.config;
-				int[] arrPath = data.path;
 				int start = data.start;
 				int end = data.end;
 
-				GameManager.Instance.setupConfig (strTerrain, start, end, arrPath);
+				GameManager.Instance.setupConfig (start, end);
 
 				EnemyConfig enA = new EnemyConfig ();
 				enA.name = "A";
@@ -187,12 +183,6 @@ public class Server : Singleton<Server>  {
 		
 		case Exec.UpdatePath:
 			{
-				string[] strTerrain = data.config;
-				int[] arrPath = data.path;
-				int start = data.start;
-				int end = data.end;
-
-				GameManager.Instance.updateConfig (strTerrain, start, end, arrPath);
 				string userID = data.userID;
 				if (userID != this.strPlayerID)
 				{

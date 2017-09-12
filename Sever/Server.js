@@ -34,11 +34,8 @@ var server = net.createServer(function(socket)
       case Exec_Ready:
       {
         var msg =  "{\"exec\" : " + Exec_Ready.toString();
-        var config = JSON.stringify(Terrain.getTerrainConfig());
-        msg += ", \"config\"  : " + config;
         msg += ", \"start\"   : " + Terrain.getStartPointTag().toString();
         msg += ", \"end\"     : " + Terrain.getEndPointTag().toString();
-        msg += ", \"path\"    : " + JSON.stringify(Terrain.searchPath());
         msg += ", \"team\"    : " + JSON.stringify(Battle.getEnemyTeam()) + "}";
         console.log(msg);
         socket.write(msg);
@@ -49,14 +46,11 @@ var server = net.createServer(function(socket)
       {
         playerReadyCnt++;
         console.log("player : " + playerReadyCnt);
-        if(playerReadyCnt == 2)
+        if(playerReadyCnt == clientList.length)
         {
           var msg =  "{\"exec\" : " + Exec_Ready.toString();
-          var config = JSON.stringify(Terrain.getTerrainConfig());
-          msg += ", \"config\"  : " + config;
           msg += ", \"start\"   : " + Terrain.getStartPointTag().toString();
           msg += ", \"end\"     : " + Terrain.getEndPointTag().toString();
-          msg += ", \"path\"    : " + JSON.stringify(Terrain.searchPath());
           msg += ", \"team\"    : " + JSON.stringify(Battle.getEnemyTeam()) + "}";
           broadcastMsg(msg, null);
         }
@@ -71,12 +65,7 @@ var server = net.createServer(function(socket)
         var msg =  "{\"exec\" : " + Exec_UpdatePath.toString();
         msg += ", \"tower\"  : " + JSON.stringify(towerName);
         msg += ", \"tileIdx\"  : " + json["tileIdx"];
-        msg += ", \"userID\"  : " + JSON.stringify(json["userID"]);
-        var config = JSON.stringify(Terrain.getTerrainConfig());
-        msg += ", \"config\"  : " + config;
-        msg += ", \"start\"   : " + Terrain.getStartPointTag().toString();
-        msg += ", \"end\"     : " + Terrain.getEndPointTag().toString();
-        msg += ", \"path\"    : " + JSON.stringify(Terrain.searchPath()) + "}";
+        msg += ", \"userID\"  : " + JSON.stringify(json["userID"]) + "}";
         broadcastMsg(msg, null);
 
       }
@@ -88,12 +77,7 @@ var server = net.createServer(function(socket)
         var msg =  "{\"exec\" : " + Exec_UpdatePath.toString();
         var config = JSON.stringify(Terrain.getTerrainConfig());
         msg += ", \"tileIdx\"  : " + json["tileIdx"];
-        msg += ", \"userID\"  : " + JSON.stringify(json["userID"]);
-        console.log(config);
-        msg += ", \"config\"  : " + config;
-        msg += ", \"start\"   : " + Terrain.getStartPointTag().toString();
-        msg += ", \"end\"     : " + Terrain.getEndPointTag().toString();
-        msg += ", \"path\"    : " + JSON.stringify(Terrain.searchPath()) + "}";
+        msg += ", \"userID\"  : " + JSON.stringify(json["userID"])+ "}";
 
         broadcastMsg(msg, null);
       }

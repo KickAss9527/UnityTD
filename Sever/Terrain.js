@@ -1,20 +1,15 @@
 //path ----------
 //12w x 10h
 var defaultTerrain = [
- "XXXOOOOOOXXX", //0
- "OOOOOXXXOOOO", //1
- "OOOOOXXXOOXO", //2
- "OOOXOXXXOXXO", //3
- "OOOXOOOOOXXO", //4
- "OOOXOOXOOOOO", //5
- "OOOOOOXOOOOO", //6
- "OOOOOOOOOOOO", //7
- "OOOOOOXOOOOO", //8
- "OOOOOOXOOOOO"];//9
+ "OOOOOOOOOOOOOOOOOOOO", "OOOOOOOOOOOOOOOOOOOO","OOOOOOOOOOOOOOOOOOOO", "OOOOOOOOOOOOOOOOOOOO",
+ "OOOOOOOOOOOOOOOOOOOO", "OOOOOOOOOOOOOOOOOOOO","OOOOOOOOOOOOOOOOOOOO", "OOOOOOOOOOOOOOOOOOOO",
+ "OOOOOOOOOOOOOOOOOOOO", "OOOOOOOOOOOOOOOOOOOO","OOOOOOOOOOOOOOOOOOOO", "OOOOOOOOOOOOOOOOOOOO",
+ "OOOOOOOOOOOOOOOOOOOO", "OOOOOOOOOOOOOOOOOOOO","OOOOOOOOOOOOOOOOOOOO", "OOOOOOOOOOOOOOOOOOOO",
+ "OOOOOOOOOOOOOOOOOOOO", "OOOOOOOOOOOOOOOOOOOO","OOOOOOOOOOOOOOOOOOOO", "OOOOOOOOOOOOOOOOOOOO",];//9
  var TerrainConfig;
  this.init = function()
  {
-   TerrainConfig = [9];
+   TerrainConfig = [20];
    for (var i = 0; i < defaultTerrain.length; i++) {
      TerrainConfig[i] = defaultTerrain[i];
    }
@@ -23,8 +18,8 @@ var defaultTerrain = [
 // 0123456789
 var TerrainWidth = TerrainConfig[0].length;
 var TerrainHeight = TerrainConfig.length;
-var PointA = new TerrainTile(new TerrainTilePoint(11, 9));
-var PointB = new TerrainTile(new TerrainTilePoint(5, 9));
+var PointA = new TerrainTile(new TerrainTilePoint(17, 17));
+var PointB = new TerrainTile(new TerrainTilePoint(0, 0));
 this.getStartPointTag = function(){return PointA.objPoint.tId;}
 this.getEndPointTag = function(){return PointB.objPoint.tId;}
 

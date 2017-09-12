@@ -6,13 +6,12 @@ using System;
 
 public class GameManager : Singleton<GameManager> {
 
-	public string[] strTerrain;
+
 	public int iStartTag;
 	public int iEndTag;
-	public int[] arrPath;
 	public string[] team;
 	public EnemyConfig[] enemyConfig;
-
+	int len = 20;
 	// Use this for initialization
 	void Start () {
 		
@@ -25,11 +24,11 @@ public class GameManager : Singleton<GameManager> {
 
 	public int convertXY_ToId(Vector2 vec)
 	{
-		return (int)(vec.x + vec.y*strTerrain[0].Length);
+		return (int)(vec.x + vec.y*len);
 	}
 	public Vector2 convertId_ToXY(int idx)
 	{
-		return new Vector2 (idx%strTerrain[0].Length, idx/strTerrain[0].Length);
+		return new Vector2 (idx%len, idx/len);
 	}
 	public void startGame()
 	{
@@ -44,22 +43,12 @@ public class GameManager : Singleton<GameManager> {
 			Server.Instance.sendReady ();
 		}
 	}
-	public void setupConfig(string[] t, int start, int end, int[] path)
-	{
-		this.strTerrain = t;
+	public void setupConfig(int start, int end)
+	{;
 		this.iStartTag = start;
 		this.iEndTag = end;
-		this.arrPath = path;
+
 		SceneManager.LoadScene ("Game");
-	}
-	public void updateConfig(string[] t, int start, int end, int[] path)
-	{
-		this.strTerrain = t;
-		this.iStartTag = start;
-		this.iEndTag = end;
-		this.arrPath = path;
-		//todo path changed, do sth to show update
-		GameScene.Instance.updateEnemyPath();
 	}
 
 	public void setupEnemyInfo(string[] team, EnemyConfig[] enemyConfig)
